@@ -1,0 +1,4 @@
+.molecule/
+.vagrant/
+roles/
+app-src/

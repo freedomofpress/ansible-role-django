@@ -1,0 +1,15 @@
+---
+- name: Run django environment
+  hosts: djangoserver
+  become: yes
+  roles:
+    - role: jdauphant.nginx
+      tags: ['nginx']
+
+    - role: django_stack
+  vars:
+    django_stack:
+      deploy_sitecode: False
+    nginx_sites:
+      default:
+        - listen 80

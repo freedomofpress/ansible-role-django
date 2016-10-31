@@ -1,0 +1,17 @@
+---
+- src: https://github.com/freedomofpress/ansible-role-generate-ssl-cert
+  name: freedomofpress.generate-ssl-cert
+  path: roles/
+
+- name: jdauphant.nginx
+  path: roles/
+
+- name: mikegleasonjr.firewall
+  path: roles/
+
+- name: ANXS.postgresql
+  path: roles/
+
+- name: cchurch.ansible-name-django
+  src: https://github.com/cchurch/ansible-role-django
+  path: roles/

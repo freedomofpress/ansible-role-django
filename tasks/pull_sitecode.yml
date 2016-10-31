@@ -1,0 +1,20 @@
+---
+
+- name: Optionally lay-down git deploy keys
+  copy:
+    dest: "{{ item.dest }}"
+    content: "{{ items.src_content }}"
+    owner: "{{ item.owner|default(omit) }}"
+    group: "{{ item.group|default(omit) }}"
+    mode: "{{ item.mode|default(0700) }}"
+  with_items: django_git_deploy
+
+- name: Pull down site code
+  git:
+    repo: "{{ django_git_repo }}"
+    version: "{{ django_git_branch }}"
+    dest: "{{ django_project_path }}"
+    keyfile: "{{ django_keyfile|default(omit) }}"
+    accept_hostkey: "{{ django_git_accept_hostkey|default(yes) }}"
+    recursive: "{{ django_git_recursive|default(yes) }}"
+  when: setup_git_repo is defined and setup_git_repo

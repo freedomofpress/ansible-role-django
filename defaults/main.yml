@@ -1,0 +1,4 @@
+---
+# defaults file for fpf-django-stack
+django_stack:
+  deploy_sitecode: True

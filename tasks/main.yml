@@ -1,0 +1,5 @@
+---
+- include: pull_sitecode.yml
+  when: django_stack.deploy_sitecode
+  tags: git
+
