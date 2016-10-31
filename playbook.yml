@@ -8,8 +8,7 @@
 
     - role: django_stack
   vars:
-    django_stack:
-      deploy_sitecode: False
+    django_stack_deploy_sitecode: False
     nginx_sites:
       default:
         - listen 80

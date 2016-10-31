@@ -1,0 +1,20 @@
+---
+
+- name: Install system dependencies
+  package:
+    name: "{{ item }}"
+  with_items: ["{{ django_stack_pkgs }}"]
+  tags: ['pkgs']
+
+- name: Configure gunicorn user
+  user:
+    name: "{{ django_stack_gcorn_user }}"
+    createhome: yes
+    home: "{{ django_stack_gcorn_home }}"
+
+- name: Config virtualenv
+  pip:
+    requirements: "{{ django_stack_deploy_dir }}/requirements.txt"
+    virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
+    virtualenv_python: python3
+  become_user: "{{ django_stack_gcorn_user }}"

@@ -1,4 +1,18 @@
 ---
 # defaults file for fpf-django-stack
-django_stack:
-  deploy_sitecode: True
+django_stack_app_name: fpf
+django_stack_deploy_sitecode: True
+django_stack_deploy_dir: /var/www/django
+
+django_stack_gcorn_home: /home/gcorn
+django_stack_gcorn_user: gcorn
+
+django_stack_pkgs:
+  - gcc
+  - g++
+  - python3
+  - virtualenv
+  - libxml2-dev
+  - libxslt-dev
+  - zlib1g-dev
+  - libjpeg-dev
