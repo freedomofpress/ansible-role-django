@@ -19,10 +19,11 @@
     virtualenv_python: python3
   become_user: "{{ django_stack_gcorn_user }}"
 
-- name: Drop credentials in virtualenv environment space
+- name: Drop credentials in virtualenv environment
   lineinfile:
-    dest: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/activate"
-    line: "export {{ item.env }}={{ item.val }}"
+    dest: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/environment"
+    line: "{{ item.env }}={{ item.val }}"
+    create: yes
   no_log: True
   with_items:
     - env: DJANGO_DB_USER
@@ -35,9 +36,15 @@
       val: "{{ django_db_port }}"
     - env: DJANGO_SECRET_KEY
       val: "{{ django_secret_key }}"
+    - env: DJANGO_SETTINGS_MODULE
+      val: "{{ django_stack_gcorn_app_settings }}"
+
+- name: Ensure environment gets called upon venv activation
+  lineinfile:
+    dest: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/activate"
+    line: ". {{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/environment"
 
 - block:
-
   - name: Database initialization
     django_manage:
       command: migrate
@@ -53,6 +60,7 @@
       app_path: "{{ django_stack_deploy_dir }}"
       settings: "{{ django_app_settings }}"
       virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
+    ignore_errors: yes
 
   become_user: "{{ django_stack_gcorn_user }}"
   environment:

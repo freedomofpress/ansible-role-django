@@ -27,6 +27,9 @@ $ ./setup.sh
 $ vagrant up
 ```
 
+Should then be able to fire up a web-browser and hit:
+`http://http://localhost:8080/`
+
 The local folder `app-src/` will be synced to `/var/www/django` in the vm guest
 upon first boot. To continually sync updated local work you can:
 
@@ -40,19 +43,15 @@ Role Variables
 Dependencies
 ------------
 
-Technically you could rip out these dependencies and just use the base logic for
-your django app installation. In that scenario you would need to find replacements
-for the following role dependencies:
-
-dependencies:
-  - role: jdauphant.nginx
-  - role: mikegleasonjr.firewall
-  - role: jcalazan.ansible-django-stack
-  - role: ANXS.postgresql
-  - role: cchurch.ansible-role-django
+For local development dependencies are located in `requirements.yml` and
+installed when running the `setup.sh` script. When utilized as a role as part of
+a larger ansible installation, these dependencies are not called and have to be
+separated defined and brought in on whatever playbook is used. Recommend you
+utilize the `playbook.yml` located at the root of this repo as a reference.
 
 Example Playbook
 ----------------
+`./playbook.yml`
 
 License
 -------

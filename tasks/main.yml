@@ -5,3 +5,6 @@
 
 - include: django_service.yml
   tags: ['django']
+
+- include: gunicorn.yml
+  tags: ['gunicorn']
