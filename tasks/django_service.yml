@@ -12,9 +12,52 @@
     createhome: yes
     home: "{{ django_stack_gcorn_home }}"
 
-- name: Config virtualenv
+- name: Setup virtualenv from requirements file
   pip:
     requirements: "{{ django_stack_deploy_dir }}/requirements.txt"
     virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
     virtualenv_python: python3
   become_user: "{{ django_stack_gcorn_user }}"
+
+- name: Drop credentials in virtualenv environment space
+  lineinfile:
+    dest: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/activate"
+    line: "export {{ item.env }}={{ item.val }}"
+  no_log: True
+  with_items:
+    - env: DJANGO_DB_USER
+      val: "{{ django_db_user }}"
+    - env: DJANGO_DB_PASSWORD
+      val: "{{ django_db_password }}"
+    - env: DJANGO_DB_HOST
+      val: "{{ django_db_host }}"
+    - env: DJANGO_DB_PORT
+      val: "{{ django_db_port }}"
+    - env: DJANGO_SECRET_KEY
+      val: "{{ django_secret_key }}"
+
+- block:
+
+  - name: Database initialization
+    django_manage:
+      command: migrate
+      app_path: "{{ django_stack_deploy_dir }}"
+      settings: "{{ django_app_settings }}"
+      virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
+
+  - name: Create superuser
+    django_manage:
+      command: >
+        createsuperuser --noinput --username={{ django_stack_superuser_admin }}
+        --email={{ django_stack_superuser_email }}
+      app_path: "{{ django_stack_deploy_dir }}"
+      settings: "{{ django_app_settings }}"
+      virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
+
+  become_user: "{{ django_stack_gcorn_user }}"
+  environment:
+    DJANGO_DB_USER: "{{ django_db_user }}"
+    DJANGO_DB_PASSWORD: "{{ django_db_password }}"
+    DJANGO_DB_HOST: "{{ django_db_host }}"
+    DJANGO_DB_PORT: "{{ django_db_port }}"
+    DJANGO_SECRET_KEY: "{{ django_secret_key }}"

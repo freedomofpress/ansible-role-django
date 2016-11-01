@@ -7,12 +7,19 @@ django_stack_deploy_dir: /var/www/django
 django_stack_gcorn_home: /home/gcorn
 django_stack_gcorn_user: gcorn
 
+django_db_user: django_user
+django_db_password: django_password
+django_db_host: localhost
+django_db_port: 5432
+
 django_stack_pkgs:
   - gcc
   - g++
   - python3
+  - python3-dev
   - virtualenv
   - libxml2-dev
   - libxslt-dev
   - zlib1g-dev
   - libjpeg-dev
+  - libpq-dev

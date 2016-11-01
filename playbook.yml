@@ -6,9 +6,27 @@
     - role: jdauphant.nginx
       tags: ['nginx']
 
+    - role: ANXS.postgresql
+
     - role: django_stack
   vars:
+    django_stack_superuser_admin: admin
+    django_stack_superuser_email: mike@freedom.press
+    django_db_user: django_user
+    django_db_password: django_password
+    django_app_settings: freedompress.settings.production
+    django_secret_key: f1822d2fe58daeadc88e0e4eef2f155fc3edd3713ff9a5d1e27696afd9231d905db51c98dc
     django_stack_deploy_sitecode: False
     nginx_sites:
       default:
         - listen 80
+    postgresql_users:
+      - name: django_user
+        pass: django_password
+    postgresql_databases:
+      - name: "{{ django_stack_app_name }}"
+    postgresql_user_privilegs:
+      - name: django_user
+        db: "{{ django_stack_app_name }}"
+        priv: "ALL"
+        role_attr_flags: "CREATEDB"
