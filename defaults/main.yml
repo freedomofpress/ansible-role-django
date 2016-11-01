@@ -3,6 +3,7 @@
 django_stack_app_name: fpf
 django_stack_deploy_sitecode: True
 django_stack_deploy_dir: /var/www/django
+django_stack_static_root: /var/www/django-static
 
 django_stack_gcorn_home: /home/gcorn
 django_stack_gcorn_user: gcorn
