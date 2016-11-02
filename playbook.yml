@@ -2,13 +2,26 @@
 - name: Run django environment
   hosts: djangoserver
   become: yes
+  pre_tasks:
+    - name: Create user
+      user:
+        name: "{{ django_stack_gcorn_user }}"
+        home: "{{ django_stack_gcorn_home }}"
+        createhome: yes
+      tags: ['node']
+
   roles:
     - role: jdauphant.nginx
       tags: ['nginx']
 
     - role: ANXS.postgresql
+      tags: ['postgres']
+
+    - role: geerlingguy.nodejs
+      tags: ['node']
 
     - role: django_stack
+      tags: ['django']
   vars:
     django_stack_superuser_admin: admin
     django_stack_superuser_email: mike@freedom.press
@@ -21,7 +34,7 @@
       default:
         - listen 80
         - location / { proxy_pass http://127.0.0.1:8000/; }
-        - location /static { root /var/www/django-static; }
+        - location /static { alias /var/www/django-static; }
     postgresql_users:
       - name: django_user
         pass: django_password
@@ -32,3 +45,5 @@
         db: "{{ django_stack_app_name }}"
         priv: "ALL"
         role_attr_flags: "CREATEDB"
+    nodejs_version: "6.x"
+    nodejs_install_npm_user: "{{ django_stack_gcorn_user }}"

@@ -3,6 +3,9 @@
   when: django_stack_deploy_sitecode
   tags: ['git']
 
+- include: npm.yml
+  tags: ['npm']
+
 - include: django_service.yml
   tags: ['django']
 

@@ -15,3 +15,6 @@
 - name: cchurch.ansible-name-django
   src: https://github.com/cchurch/ansible-role-django
   path: roles/
+
+- name: geerlingguy.nodejs
+  path: roles/
