@@ -12,6 +12,7 @@
         requirements: "{{ django_stack_deploy_dir }}/requirements.txt"
         virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
         virtualenv_python: python3
+      notify: Restart Gunicorn
 
   rescue:
     - name: Setup virtualenv from requirements file
@@ -19,6 +20,7 @@
         requirements: "{{ django_stack_deploy_dir }}/requirements.txt"
         virtualenv_python: python3
         executable: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/pip"
+      notify: Restart Gunicorn
   become_user: "{{ django_stack_gcorn_user }}"
 
 - name: Drop credentials in virtualenv environment
@@ -42,6 +44,7 @@
       val: "{{ django_stack_gcorn_app_settings }}"
     - env: DJANGO_STATIC_ROOT
       val: "{{ django_stack_static_root }}"
+  notify: Restart Gunicorn
 
 
 - name: Ensure environment gets called upon venv activation
