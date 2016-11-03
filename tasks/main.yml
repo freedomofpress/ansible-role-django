@@ -1,4 +1,8 @@
 ---
+
+- include: setup.yml
+  tags: ['always']
+
 - include: pull_sitecode.yml
   when: django_stack_deploy_sitecode
   tags: ['git']

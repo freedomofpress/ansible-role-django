@@ -6,20 +6,6 @@
   with_items: ["{{ django_stack_pkgs }}"]
   tags: ['pkgs']
 
-- name: Configure gunicorn user
-  user:
-    name: "{{ django_stack_gcorn_user }}"
-    createhome: yes
-    home: "{{ django_stack_gcorn_home }}"
-
-- name: Establish needed directories
-  file:
-    path: "{{ item }}"
-    state: directory
-    owner: "{{ django_stack_gcorn_user }}"
-    group: "{{ django_stack_gcorn_group }}"
-  with_items:
-    - "{{ django_stack_static_root }}"
 
 - name: Setup virtualenv from requirements file
   pip:
