@@ -10,6 +10,7 @@ EnvironmentFile={{django_stack_gcorn_home}}/{{django_stack_app_name}}/bin/enviro
 WorkingDirectory={{ django_stack_deploy_dir }}
 ExecStart={{django_stack_gcorn_home}}/{{django_stack_app_name}}/bin/gunicorn \
                     --pid /run/gunicorn/pid  \
+                    --bind localhost:{{django_stack_gcorn_port}} \
                     --error-logfile={{ django_stack_gcorn_log}}.error \
                     {{ django_stack_gcorn_app }}
 ExecReload=/bin/kill -s HUP $MAINPID
