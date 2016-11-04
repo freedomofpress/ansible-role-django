@@ -5,6 +5,7 @@
     name: "{{ django_stack_gcorn_user }}"
     createhome: yes
     home: "{{ django_stack_gcorn_home }}"
+    shell: /bin/bash
 
 - name: Establish needed directories
   file:
