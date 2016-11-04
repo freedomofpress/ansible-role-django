@@ -1,20 +1,34 @@
 ---
 
+- name: Ensure git dependencies exist
+  package:
+    name: "{{ item }}"
+  with_items: "{{ django_stack_git_pkgs }}"
+
+- name: Ensure key dest folders exist
+  file:
+    state: directory
+    dest: "{{ item.dest|default(django_stack_gcorn_home+'/.ssh/') }}"
+    owner: "{{ item.owner|default(django_stack_gcorn_user) }}"
+    group: "{{ item.group|default(django_stack_gcorn_group) }}"
+    mode: "{{ item.mode|default(0700) }}"
+  with_items: "{{ django_stack_git_deploy }}"
+
 - name: Optionally lay-down git deploy keys
   copy:
-    dest: "{{ item.dest }}"
-    content: "{{ items.src_content }}"
-    owner: "{{ item.owner|default(omit) }}"
-    group: "{{ item.group|default(omit) }}"
+    dest: "{{ item.dest|default(django_stack_gcorn_home+'/.ssh/github_deploy') }}"
+    content: "{{ item.key }}"
+    owner: "{{ item.owner|default(django_stack_gcorn_user) }}"
+    group: "{{ item.group|default(django_stack_gcorn_group) }}"
     mode: "{{ item.mode|default(0700) }}"
-  with_items: django_git_deploy
+  with_items: "{{ django_stack_git_deploy }}"
 
 - name: Pull down site code
   git:
-    repo: "{{ django_git_repo }}"
-    version: "{{ django_git_branch }}"
-    dest: "{{ django_project_path }}"
-    keyfile: "{{ django_keyfile|default(omit) }}"
-    accept_hostkey: "{{ django_git_accept_hostkey|default(yes) }}"
-    recursive: "{{ django_git_recursive|default(yes) }}"
-  when: setup_git_repo is defined and setup_git_repo
+    repo: "{{ item.url }}"
+    version: "{{ item.branch|default('master') }}"
+    dest: "{{ item.dest|default(django_stack_deploy_dir) }}"
+    key_file: "{{ item.key|default(omit) }}"
+    accept_hostkey: "{{ item.accept_hostkey|default('yes') }}"
+    recursive: "{{ item.recursive|default('yes') }}"
+  with_items: "{{ django_stack_git_repo }}"
