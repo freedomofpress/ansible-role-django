@@ -28,6 +28,7 @@ django_stack_pkgs:
   - zlib1g-dev
   - libjpeg-dev
   - libpq-dev
+  - libffi-dev
 
 django_stack_git_pkgs:
   - git
