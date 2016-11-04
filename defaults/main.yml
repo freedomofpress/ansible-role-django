@@ -1,13 +1,13 @@
 ---
 # defaults file for fpf-django-stack
 django_stack_app_name: fpf
-django_stack_deploy_sitecode: True
 django_stack_deploy_dir: /var/www/django
 django_stack_static_root: /var/www/django-static
 
 django_stack_gcorn_home: /home/gcorn
 django_stack_gcorn_user: gcorn
 django_stack_gcorn_group: gcorn
+django_stack_gcorn_port: 8000
 django_stack_gcorn_log: /var/log/{{django_stack_app_name}}/app
 django_stack_gcorn_app: freedompress.wsgi
 django_stack_gcorn_app_settings: freedompress.settings.production
@@ -28,3 +28,12 @@ django_stack_pkgs:
   - zlib1g-dev
   - libjpeg-dev
   - libpq-dev
+  - libffi-dev
+
+django_stack_git_pkgs:
+  - git
+
+# Git code parameters
+django_stack_git_repo: []
+django_stack_git_deploy:
+  - key: "{{ lookup('file', 'deploy_key') }}"
