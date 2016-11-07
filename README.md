@@ -16,41 +16,47 @@ These are the following system requirements:
 
 * vagrant
 * ansible >= 2.2.x
+* molecule
 
-Getting started for local development
--------------------------------------
+Easy way to install the last two is to utilize a virtualenv and install with:
+
+```bash
+$ pip install -r requirements.txt
+```
+
+Getting started for local deployment
+------------------------------------
 
 Take note of the git url code-base you are going to be working from.
-Here is an example of a public django repo made by our friends at
-littleweaver: `git@github.com:littleweaver/littleweaverweb.com.git`.
+This has to be in [ansible git repo](https://docs.ansible.com/ansible/git_module.html).
 
+An example is: `ssh://git@github.com/myorg/mysite.com.git`. If you are using a
+publically visible git repo, you should set the following in your playbook:
+
+```yaml
+django_stack_git_deploy: []
+```
+
+Once you got that sorted out, from a terminal sitting in this directory:
 
 ```bash
 # the first run you are going to need to run these two commands
 # replace DJANGO_GIT_REPO url with your django repo
-$ export DJANGO_GIT_REPO=git@github.com:littleweaver/littleweaverweb.com.git
+$ export DJANGO_GIT_REPO=ssh://git@github.com/myorg/mysite.com.git
 $ ./setup.sh 
 
-$ vagrant up
+# copy a read-only deploy key to ./deploy_key if applicable
+$ cp ~/.ssh/github_deploy ./deploy_key
+$ molecule converge
 ```
 
 What happened here ^^^?
 * Ansible galaxy dependencies were pulled into `roles/`
-* The git repo you specified was pulled down into `app-src/`
-* `app-src/` was rsynced over to the vagrant box
 * the vagrant box is fired up and local `playbook.yml` is run
 
 Should then be able to fire up a web-browser and hit:
 `http://localhost:8080/`
 
-The local folder `app-src/` will be synced to `/var/www/django` in the vm guest
-upon first boot. To continually sync updated local work you can:
-
-* do it manually with `vagrant rsync` or
-* have vagrant perform it automatically with `vagrant rsync-auto`
-
-Note this is slightly different than how you deploy this role in production. Added
-some shortcuts for ease of use to suit local app development.
 
 Dependencies
 ------------
@@ -63,16 +69,6 @@ defined in the meta folder. This was intentional design. Soo you would
 have to go through and manually integrate your own dependencies or copy the
 `requirements.yml` and install to your global roles path. It is recommended you
 utilize the `playbook.yml` located at the root of this repo as a reference.
-
-The other difference between the local dev and prod is that here I use a cheat
-to utilize a developers existing creds to pull down the git code and rsync it,
-in prod deployment you need to have access to git deploy keys if it is a private
-repo. Those keys will get distributed to the end-system and the git repo pulled
-in, assuming you specified a git repo in the role variables. `tasks/pull_sitecode.yml`
-handles this legwork which you can optionally skip (means you would have to
-lay out the django code in some other way). By default you can drop a deploy key
-at `./deploy_key` which will be copied over and can be used for git checkout.
-
 
 Example Playbook
 ----------------

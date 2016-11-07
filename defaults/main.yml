@@ -35,5 +35,4 @@ django_stack_git_pkgs:
 
 # Git code parameters
 django_stack_git_repo: []
-django_stack_git_deploy:
-  - key: "{{ lookup('file', 'deploy_key') }}"
+django_stack_git_deploy: []
