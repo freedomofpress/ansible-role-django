@@ -31,6 +31,7 @@
     version: "{{ item.branch|default('master') }}"
     dest: "{{ item.dest|default(django_stack_deploy_dir) }}"
     key_file: "{{ item.key|default(omit) }}"
+    force: "{{ item.force|default(omit) }}"
     accept_hostkey: "{{ item.accept_hostkey|default('yes') }}"
     recursive: "{{ item.recursive|default('yes') }}"
   with_items: "{{ django_stack_git_repo }}"
