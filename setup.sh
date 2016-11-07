@@ -3,13 +3,8 @@
 
 echo "##### Ansible-galaxy dependencies"
 ansible-galaxy install -r requirements.yml
-echo "##### Local django application code dependency"
-if [ ! -d ./app-src ]; then
-    if [ -z "$DJANGO_GIT_REPO" ]; then
-        echo -n "Enter the git repo url for the django code : "
-        read DJANGO_GIT_REPO
-    fi
-    git clone $DJANGO_GIT_REPO app-src
-else
-    echo "Custom django repo already checked out at under app-src/"
+if [ -z "$DJANGO_GIT_REPO" ]; then
+    echo "##### Local django application code dependency"
+    echo "Please set an environment variable named DJANGO_GIT_REPO (in ansible format)"
+    echo "(for example: export DJANGO_GIT_REPO=ssh://git@github.com/myorg/mydjango.code.git)"
 fi

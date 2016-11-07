@@ -2,4 +2,4 @@
 .vagrant/
 roles/
 app-src/
-deploy_key
+deploy_key*

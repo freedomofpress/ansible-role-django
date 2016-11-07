@@ -13,8 +13,9 @@
     group: "{{ item.group|default(django_stack_gcorn_group) }}"
     mode: "{{ item.mode|default(0700) }}"
   with_items: "{{ django_stack_git_deploy }}"
+  no_log: true
 
-- name: Optionally lay-down git deploy keys
+- name: Lay-down git deploy keys
   copy:
     dest: "{{ item.dest|default(django_stack_gcorn_home+'/.ssh/github_deploy') }}"
     content: "{{ item.key }}"
@@ -22,6 +23,7 @@
     group: "{{ item.group|default(django_stack_gcorn_group) }}"
     mode: "{{ item.mode|default(0700) }}"
   with_items: "{{ django_stack_git_deploy }}"
+  no_log: true
 
 - name: Pull down site code
   git:
@@ -29,6 +31,7 @@
     version: "{{ item.branch|default('master') }}"
     dest: "{{ item.dest|default(django_stack_deploy_dir) }}"
     key_file: "{{ item.key|default(omit) }}"
+    force: "{{ item.force|default(omit) }}"
     accept_hostkey: "{{ item.accept_hostkey|default('yes') }}"
     recursive: "{{ item.recursive|default('yes') }}"
   with_items: "{{ django_stack_git_repo }}"
