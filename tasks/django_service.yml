@@ -11,14 +11,14 @@
       pip:
         requirements: "{{ django_stack_app_dir }}/requirements.txt"
         virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
-        virtualenv_python: python3
+        virtualenv_python: "{{ django_stack_venv_python }}"
       notify: Restart Gunicorn
 
   rescue:
     - name: Setup virtualenv from requirements file
       pip:
         requirements: "{{ django_stack_app_dir }}/requirements.txt"
-        virtualenv_python: python3
+        virtualenv_python: "{{ django_stack_venv_python }}"
         executable: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/pip"
       notify: Restart Gunicorn
   become_user: "{{ django_stack_gcorn_user }}"

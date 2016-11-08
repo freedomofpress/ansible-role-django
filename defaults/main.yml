@@ -12,6 +12,7 @@ django_stack_gcorn_port: 8000
 django_stack_gcorn_log: /var/log/{{django_stack_app_name}}/app
 django_stack_gcorn_app: freedompress.wsgi
 django_stack_gcorn_app_settings: freedompress.settings.production
+django_stack_venv_python: python3
 
 django_db_user: django_user
 django_db_password: django_password
