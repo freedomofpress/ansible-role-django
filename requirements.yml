@@ -7,3 +7,6 @@
 - name: ANXS.postgresql
 
 - name: geerlingguy.nodejs
+
+- src: https://github.com/freedomofpress/ansible-elasticsearch
+  name: elastic.elasticsearch

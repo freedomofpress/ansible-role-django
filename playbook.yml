@@ -24,6 +24,42 @@
     - role: freedomofpress.openssl_node
       tags: ssl-node
 
+
+- name: Setup Elasticsearch
+  hosts: database
+  become: yes
+  roles:
+    - role: elastic.elasticsearch
+      tags: ['elastic']
+
+    - role: jdauphant.nginx
+      tags: ['elastic', 'nginx']
+      es_config:
+        cluster.name: "node1"
+        network.host: [_local_]
+        bootstrap.mlockall: true
+        index.cache.field.type: soft
+        index.cache.field.max_size: 50000
+        index.cache.field.expire: 10m
+        discovery.zen.ping.multicast.enabled: false
+  vars:
+    es_plugins:
+        - plugin: mobz/elasticsearch-head
+    es_instance_name: "node1"
+    es_scripts: false
+    es_version_lock: true
+    es_major_version: "2.x"
+    es_version: "2.4.0"
+    es_plugins_reinstall: true
+    es_heap_size: "{{((ansible_memtotal_mb / 2) | int) if ansible_memtotal_mb < 65536 else 31744 }}m"
+    nginx_sites:
+      encrypted:
+        - listen {{ database_ip }}:9200 ssl
+        - client_max_body_size 200M
+        - location / { proxy_pass http://127.0.0.1:9200/; }
+        - ssl_certificate /etc/ssl/certs/{{ansible_fqdn}}.pem
+        - ssl_certificate_key /etc/ssl/private/{{ansible_fqdn}}-key.pem
+
 - name: Setup postgres
   hosts: database
   become: yes
@@ -46,6 +82,7 @@
         pass: django_password
     postgresql_databases:
       - name: fpf
+        owner: django_user
     postgresql_user_privilegs:
       - name: django_user
         priv: "ALL"
@@ -89,6 +126,7 @@
     django_db_password: django_password
     django_app_settings: freedompress.settings.production
     django_secret_key: f1822d2fe58daeadc88e0e4eef2f155fc3edd3713ff9a5d1e27696afd9231d905db51c98dc
+    django_stack_es_host_url: https://database:9200
     nginx_sites:
       default:
         - listen 80
@@ -106,3 +144,8 @@
     django_stack_git_repo:
       - url: "{{ lookup('ENV','DJANGO_GIT_REPO') }}"
         key: "/home/gcorn/.ssh/github_deploy"
+    django_stack_manage_post:
+      - createdevdata
+      - transfer_authors
+      - transfer_blogs
+      - update_index
