@@ -41,6 +41,9 @@ django_stack_git_pkgs:
 django_stack_git_repo: []
 django_stack_git_deploy: []
 
+# django post manage.py tasks
+django_stack_manage_post: []
+
 django_stack_gunicorn_envs:
   DJANGO_DB_USER: "{{ django_db_user }}"
   DJANGO_DB_PASSWORD: "{{ django_db_password }}"

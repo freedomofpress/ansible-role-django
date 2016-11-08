@@ -143,3 +143,8 @@
     django_stack_git_repo:
       - url: "{{ lookup('ENV','DJANGO_GIT_REPO') }}"
         key: "/home/gcorn/.ssh/github_deploy"
+    django_stack_manage_post:
+      - createdevdata
+      - transfer_authors
+      - transfer_blogs
+      - update_index

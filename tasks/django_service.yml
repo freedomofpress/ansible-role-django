@@ -59,5 +59,14 @@
       virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
     ignore_errors: yes
 
+  - name: Django optional post commands
+    django_manage:
+      command: "{{ item }}"
+      app_path: "{{ django_stack_deploy_dir }}"
+      settings: "{{ django_app_settings }}"
+      virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
+    with_items: ["{{ django_stack_manage_post }}"]
+    ignore_errors: yes
+
   become_user: "{{ django_stack_gcorn_user }}"
   environment: "{{ django_stack_gunicorn_envs }}"
