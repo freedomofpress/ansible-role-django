@@ -82,6 +82,7 @@
         pass: django_password
     postgresql_databases:
       - name: fpf
+        owner: django_user
     postgresql_user_privilegs:
       - name: django_user
         priv: "ALL"
