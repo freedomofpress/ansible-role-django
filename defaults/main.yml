@@ -20,6 +20,7 @@ django_stack_optional_pip: []
 # - name: django
 #   python: python2
 
+# database settings
 django_db_user: django_user
 django_db_password: django_password
 django_db_host: localhost
