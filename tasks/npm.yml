@@ -3,7 +3,7 @@
 - name: Ensure npm has permissions to write
   file:
     state: directory
-    path: "{{ django_stack_deploy_dir }}"
+    path: "{{ django_stack_npm_dir }}"
     recurse: yes
     owner: "{{ django_stack_gcorn_user }}"
     group: "{{ django_stack_gcorn_group }}"
@@ -12,14 +12,14 @@
   - name: NPM dependency install
     # ran into a lot of issues using the ansible npm, shell, command modules
     # had to fall back to raw to press forward
-    raw: cd "{{ django_stack_deploy_dir }}" && npm install
+    raw: cd "{{ django_stack_npm_dir }}" && npm install
     register: npm_install
     #changed_when: "'install' in npm_install.std_out"
 
   - name: Run npm build
     shell: npm run build
     args:
-      chdir: "{{ django_stack_deploy_dir }}"
+      chdir: "{{ django_stack_npm_dir }}"
 
   become_user: "{{ django_stack_gcorn_user }}"
   environment:

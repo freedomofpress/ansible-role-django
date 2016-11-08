@@ -9,7 +9,7 @@
 - block:
     - name: Setup virtualenv from requirements file
       pip:
-        requirements: "{{ django_stack_deploy_dir }}/requirements.txt"
+        requirements: "{{ django_stack_app_dir }}/requirements.txt"
         virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
         virtualenv_python: python3
       notify: Restart Gunicorn
@@ -17,7 +17,7 @@
   rescue:
     - name: Setup virtualenv from requirements file
       pip:
-        requirements: "{{ django_stack_deploy_dir }}/requirements.txt"
+        requirements: "{{ django_stack_app_dir }}/requirements.txt"
         virtualenv_python: python3
         executable: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/pip"
       notify: Restart Gunicorn
@@ -42,7 +42,7 @@
   - name: Database initialization and misc tasks
     django_manage:
       command: "{{ item }}"
-      app_path: "{{ django_stack_deploy_dir }}"
+      app_path: "{{ django_stack_app_dir }}"
       settings: "{{ django_app_settings }}"
       virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
     with_items:
@@ -54,7 +54,7 @@
       command: >
         createsuperuser --noinput --username={{ django_stack_superuser_admin }}
         --email={{ django_stack_superuser_email }}
-      app_path: "{{ django_stack_deploy_dir }}"
+      app_path: "{{ django_stack_app_dir }}"
       settings: "{{ django_app_settings }}"
       virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
     ignore_errors: yes
@@ -62,7 +62,7 @@
   - name: Django optional post commands
     django_manage:
       command: "{{ item }}"
-      app_path: "{{ django_stack_deploy_dir }}"
+      app_path: "{{ django_stack_app_dir }}"
       settings: "{{ django_app_settings }}"
       virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
     with_items: ["{{ django_stack_manage_post }}"]

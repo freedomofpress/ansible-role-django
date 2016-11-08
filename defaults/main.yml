@@ -2,6 +2,7 @@
 # defaults file for fpf-django-stack
 django_stack_app_name: fpf
 django_stack_deploy_dir: /var/www/django
+django_stack_app_dir: "{{ django_stack_deploy_dir }}"
 django_stack_static_root: /var/www/django-static
 
 django_stack_gcorn_home: /home/gcorn
@@ -20,6 +21,9 @@ django_db_port: 5432
 #elasticsearch
 django_stack_es_host_url: http://localhost:9200
 django_stack_es_ca_path: /etc/ssl/certs/testca_freedom_press.pem
+
+#npm directory
+django_stack_npm_dir: "{{ django_stack_app_dir }}"
 
 django_stack_pkgs:
   - gcc
