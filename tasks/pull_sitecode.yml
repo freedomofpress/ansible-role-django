@@ -34,4 +34,5 @@
     force: "{{ item.force|default(omit) }}"
     accept_hostkey: "{{ item.accept_hostkey|default('yes') }}"
     recursive: "{{ item.recursive|default('yes') }}"
+  register: git_pull
   with_items: "{{ django_stack_git_repo }}"

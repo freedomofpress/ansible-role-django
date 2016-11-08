@@ -22,6 +22,7 @@
     raw: cd "{{ django_stack_npm_dir }}" && npm install
     register: npm_install
     #changed_when: "'install' in npm_install.std_out"
+    when: git_pull.changed
 
   - name: Optional npm commands
     shell: "npm {{ item }}"
