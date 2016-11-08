@@ -26,24 +26,10 @@
 - name: Drop credentials in virtualenv environment
   lineinfile:
     dest: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/environment"
-    line: "{{ item.env }}={{ item.val }}"
+    line: "{{ item.key }}={{ item.value }}"
     create: yes
   no_log: True
-  with_items:
-    - env: DJANGO_DB_USER
-      val: "{{ django_db_user }}"
-    - env: DJANGO_DB_PASSWORD
-      val: "{{ django_db_password }}"
-    - env: DJANGO_DB_HOST
-      val: "{{ django_db_host }}"
-    - env: DJANGO_DB_PORT
-      val: "{{ django_db_port }}"
-    - env: DJANGO_SECRET_KEY
-      val: "{{ django_secret_key }}"
-    - env: DJANGO_SETTINGS_MODULE
-      val: "{{ django_stack_gcorn_app_settings }}"
-    - env: DJANGO_STATIC_ROOT
-      val: "{{ django_stack_static_root }}"
+  with_dict: "{{ django_stack_gunicorn_envs }}"
   notify: Restart Gunicorn
 
 
@@ -74,10 +60,4 @@
     ignore_errors: yes
 
   become_user: "{{ django_stack_gcorn_user }}"
-  environment:
-    DJANGO_DB_USER: "{{ django_db_user }}"
-    DJANGO_DB_PASSWORD: "{{ django_db_password }}"
-    DJANGO_DB_HOST: "{{ django_db_host }}"
-    DJANGO_DB_PORT: "{{ django_db_port }}"
-    DJANGO_SECRET_KEY: "{{ django_secret_key }}"
-    DJANGO_STATIC_ROOT: "{{ django_stack_static_root }}"
+  environment: "{{ django_stack_gunicorn_envs }}"

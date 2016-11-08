@@ -17,6 +17,10 @@ django_db_password: django_password
 django_db_host: localhost
 django_db_port: 5432
 
+#elasticsearch
+django_stack_es_host_url: http://localhost:9200
+django_stack_es_ca_path: /etc/ssl/certs/testca_freedom_press.pem
+
 django_stack_pkgs:
   - gcc
   - g++
@@ -36,3 +40,14 @@ django_stack_git_pkgs:
 # Git code parameters
 django_stack_git_repo: []
 django_stack_git_deploy: []
+
+django_stack_gunicorn_envs:
+  DJANGO_DB_USER: "{{ django_db_user }}"
+  DJANGO_DB_PASSWORD: "{{ django_db_password }}"
+  DJANGO_DB_HOST: "{{ django_db_host }}"
+  DJANGO_DB_PORT: "{{ django_db_port }}"
+  DJANGO_SECRET_KEY: "{{ django_secret_key }}"
+  DJANGO_SETTINGS_MODULE: "{{ django_stack_gcorn_app_settings }}"
+  DJANGO_STATIC_ROOT: "{{ django_stack_static_root }}"
+  DJANGO_ES_HOST: "{{ django_stack_es_host_url }}"
+  DJANGO_ES_CA_PATH: "{{ django_stack_es_ca_path }}"
