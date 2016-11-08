@@ -31,20 +31,25 @@
       notify: Restart Gunicorn
   become_user: "{{ django_stack_gcorn_user }}"
 
-- name: Drop credentials in virtualenv environment
+- name: Ensure environment parameters are sufficiently exported
   lineinfile:
     dest: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/environment"
-    line: "{{ item.key }}={{ item.value }}"
+    line: "set -a"
     create: yes
-  no_log: True
-  with_dict: "{{ django_stack_gunicorn_envs }}"
-  notify: Restart Gunicorn
-
 
 - name: Ensure environment gets called upon venv activation
   lineinfile:
     dest: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/activate"
     line: ". {{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/environment"
+    lineafter: "^set -a"
+
+- name: Drop credentials in virtualenv environment
+  lineinfile:
+    dest: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/environment"
+    line: "{{ item.key }}={{ item.value }}"
+  no_log: True
+  with_dict: "{{ django_stack_gunicorn_envs }}"
+  notify: Restart Gunicorn
 
 - block:
   - name: Database initialization and misc tasks
