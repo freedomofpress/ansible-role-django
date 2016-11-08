@@ -8,6 +8,13 @@
     owner: "{{ django_stack_gcorn_user }}"
     group: "{{ django_stack_gcorn_group }}"
 
+- name: Optional npm global packages
+  become: yes
+  npm:
+    global: yes
+    name: "{{ item }}"
+  with_items: "{{ django_stack_npm_global_pkgs }}"
+
 - block:
   - name: NPM dependency install
     # ran into a lot of issues using the ansible npm, shell, command modules
@@ -16,21 +23,20 @@
     register: npm_install
     #changed_when: "'install' in npm_install.std_out"
 
-  - name: Optional npm shell commands
+  - name: Optional npm commands
     shell: "npm {{ item }}"
     args:
       chdir: "{{ django_stack_npm_dir }}"
-    when: "{{ django_stack_npm_commands }} != []"
     with_items: "{{ django_stack_npm_commands }}"
+
+  - name: Optional shell commands
+    shell: "{{ item }}"
+    args:
+      chdir: "{{ django_stack_npm_dir }}"
+    with_items: "{{ django_stack_shell_commands }}"
 
   become_user: "{{ django_stack_gcorn_user }}"
   environment:
     NODE_ENV: production
     NODE_PATH: /usr/lib/nodejs:/usr/lib/node_modules:/usr/share/javascript:/usr/local/lib/npm/lib/node_modules
 
-- name: Optional npm global packages
-  become: yes
-  npm:
-    global: yes
-    name: "{{ item }}"
-  with_items: ["{{ django_stack_npm_global_pkgs }}"]

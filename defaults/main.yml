@@ -34,6 +34,7 @@ django_stack_es_ca_path: /etc/ssl/certs/testca_freedom_press.pem
 django_stack_npm_dir: "{{ django_stack_app_dir }}"
 django_stack_npm_commands: []
 django_stack_npm_global_pkgs: []
+django_stack_shell_commands: []
 
 django_stack_pkgs:
   - gcc
