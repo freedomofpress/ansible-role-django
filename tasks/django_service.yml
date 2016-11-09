@@ -35,7 +35,7 @@
 
 - name: Ensure environment parameters are sufficiently exported
   lineinfile:
-    dest: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/environment"
+    dest: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/activate"
     line: "set -a"
     create: yes
 
