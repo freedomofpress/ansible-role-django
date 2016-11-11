@@ -2,16 +2,25 @@
 # defaults file for fpf-django-stack
 django_stack_app_name: fpf
 django_stack_deploy_dir: /var/www/django
+django_stack_app_dir: "{{ django_stack_deploy_dir }}"
 django_stack_static_root: /var/www/django-static
 
 django_stack_gcorn_home: /home/gcorn
 django_stack_gcorn_user: gcorn
 django_stack_gcorn_group: gcorn
 django_stack_gcorn_port: 8000
-django_stack_gcorn_log: /var/log/{{django_stack_app_name}}/app
-django_stack_gcorn_app: freedompress.wsgi
-django_stack_gcorn_app_settings: freedompress.settings.production
+django_stack_gcorn_log: "/var/log/{{django_stack_app_name}}/app"
+django_stack_gcorn_app: "{{django_stack_app_name}}.wsgi"
+django_stack_gcorn_app_settings: "{{django_stack_app_name}}.settings.production"
 
+# virtualenv and pip
+django_stack_venv_python: python3
+django_stack_venv_sitepackage: no
+django_stack_optional_pip: []
+# - name: django
+#   python: python2
+
+# database settings
 django_db_user: django_user
 django_db_password: django_password
 django_db_host: localhost
@@ -20,6 +29,12 @@ django_db_port: 5432
 #elasticsearch
 django_stack_es_host_url: http://localhost:9200
 django_stack_es_ca_path: /etc/ssl/certs/testca_freedom_press.pem
+
+#npm settings
+django_stack_npm_dir: "{{ django_stack_app_dir }}"
+django_stack_npm_commands: []
+django_stack_npm_global_pkgs: []
+django_stack_shell_commands: []
 
 django_stack_pkgs:
   - gcc

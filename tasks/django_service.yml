@@ -6,44 +6,59 @@
   with_items: ["{{ django_stack_pkgs }}"]
   tags: ['pkgs']
 
+- name: Global optional python dependencies
+  pip:
+    name: "{{ item.name }}"
+    virtualenv_python: "{{ item.python }}"
+  with_items: ["{{ django_stack_optional_pip }}"]
+
 - block:
     - name: Setup virtualenv from requirements file
       pip:
-        requirements: "{{ django_stack_deploy_dir }}/requirements.txt"
+        requirements: "{{ django_stack_app_dir }}/requirements.txt"
         virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
-        virtualenv_python: python3
+        virtualenv_python: "{{ django_stack_venv_python }}"
+        virtualenv_site_packages: "{{ django_stack_venv_sitepackage }}"
       notify: Restart Gunicorn
+      when: git_pull.changed
 
   rescue:
     - name: Setup virtualenv from requirements file
       pip:
-        requirements: "{{ django_stack_deploy_dir }}/requirements.txt"
-        virtualenv_python: python3
+        requirements: "{{ django_stack_app_dir }}/requirements.txt"
+        virtualenv_python: "{{ django_stack_venv_python }}"
         executable: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/pip"
+        virtualenv_site_packages: "{{ django_stack_venv_sitepackage }}"
       notify: Restart Gunicorn
+      when: git_pull.changed
   become_user: "{{ django_stack_gcorn_user }}"
 
-- name: Drop credentials in virtualenv environment
+- name: Ensure environment parameters are sufficiently exported
   lineinfile:
-    dest: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/environment"
-    line: "{{ item.key }}={{ item.value }}"
+    dest: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/activate"
+    line: "set -a"
     create: yes
-  no_log: True
-  with_dict: "{{ django_stack_gunicorn_envs }}"
-  notify: Restart Gunicorn
-
 
 - name: Ensure environment gets called upon venv activation
   lineinfile:
     dest: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/activate"
     line: ". {{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/environment"
+    insertafter: "^set -a"
+
+- name: Drop credentials in virtualenv environment
+  lineinfile:
+    dest: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/environment"
+    line: "{{ item.key }}={{ item.value }}"
+  no_log: True
+  with_dict: "{{ django_stack_gunicorn_envs }}"
+  notify: Restart Gunicorn
 
 - block:
   - name: Database initialization and misc tasks
     django_manage:
       command: "{{ item }}"
-      app_path: "{{ django_stack_deploy_dir }}"
-      settings: "{{ django_app_settings }}"
+      app_path: "{{ django_stack_app_dir }}"
+      settings: "{{ django_stack_gcorn_app_settings }}"
       virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
     with_items:
       - migrate
@@ -54,16 +69,16 @@
       command: >
         createsuperuser --noinput --username={{ django_stack_superuser_admin }}
         --email={{ django_stack_superuser_email }}
-      app_path: "{{ django_stack_deploy_dir }}"
-      settings: "{{ django_app_settings }}"
+      app_path: "{{ django_stack_app_dir }}"
+      settings: "{{ django_stack_gcorn_app_settings }}"
       virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
     ignore_errors: yes
 
   - name: Django optional post commands
     django_manage:
       command: "{{ item }}"
-      app_path: "{{ django_stack_deploy_dir }}"
-      settings: "{{ django_app_settings }}"
+      app_path: "{{ django_stack_app_dir }}"
+      settings: "{{ django_stack_gcorn_app_settings }}"
       virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
     with_items: ["{{ django_stack_manage_post }}"]
     ignore_errors: yes

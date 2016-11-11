@@ -7,7 +7,7 @@ PIDFile=/run/gunicorn/pid
 User={{ django_stack_gcorn_user }}
 Group={{ django_stack_gcorn_group }}
 EnvironmentFile={{django_stack_gcorn_home}}/{{django_stack_app_name}}/bin/environment
-WorkingDirectory={{ django_stack_deploy_dir }}
+WorkingDirectory={{ django_stack_app_dir }}
 ExecStart={{django_stack_gcorn_home}}/{{django_stack_app_name}}/bin/gunicorn \
                     --pid /run/gunicorn/pid  \
                     --bind localhost:{{django_stack_gcorn_port}} \

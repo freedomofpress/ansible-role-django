@@ -124,7 +124,7 @@
     django_db_user: django_user
     django_db_host: database
     django_db_password: django_password
-    django_app_settings: freedompress.settings.production
+    django_stack_gcorn_app_settings: freedompress.settings.production
     django_secret_key: f1822d2fe58daeadc88e0e4eef2f155fc3edd3713ff9a5d1e27696afd9231d905db51c98dc
     django_stack_es_host_url: https://database:9200
     nginx_sites:
