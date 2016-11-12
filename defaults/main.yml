@@ -4,6 +4,7 @@ django_stack_app_name: fpf
 django_stack_deploy_dir: /var/www/django
 django_stack_app_dir: "{{ django_stack_deploy_dir }}"
 django_stack_static_root: /var/www/django-static
+django_stack_media_root: /var/www/django-media
 
 django_stack_gcorn_home: /home/gcorn
 django_stack_gcorn_user: gcorn
@@ -67,5 +68,6 @@ django_stack_gunicorn_envs:
   DJANGO_SECRET_KEY: "{{ django_secret_key }}"
   DJANGO_SETTINGS_MODULE: "{{ django_stack_gcorn_app_settings }}"
   DJANGO_STATIC_ROOT: "{{ django_stack_static_root }}"
+  DJANGO_MEDIA_ROOT: "{{ django_stack_media_root }}"
   DJANGO_ES_HOST: "{{ django_stack_es_host_url }}"
   DJANGO_ES_CA_PATH: "{{ django_stack_es_ca_path }}"
