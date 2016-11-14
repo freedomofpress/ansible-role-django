@@ -12,6 +12,11 @@
     virtualenv_python: "{{ item.python }}"
   with_items: ["{{ django_stack_optional_pip }}"]
 
+- name: Check if virtualenv folder exists
+  stat:
+    path: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
+  register: venv_folder
+
 - block:
     - name: Setup virtualenv from requirements file
       pip:
@@ -20,7 +25,7 @@
         virtualenv_python: "{{ django_stack_venv_python }}"
         virtualenv_site_packages: "{{ django_stack_venv_sitepackage }}"
       notify: Restart Gunicorn
-      when: git_pull.changed
+      when: "git_pull.changed or not venv_folder.stat.exists"
 
   rescue:
     - name: Setup virtualenv from requirements file
@@ -30,7 +35,7 @@
         executable: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/pip"
         virtualenv_site_packages: "{{ django_stack_venv_sitepackage }}"
       notify: Restart Gunicorn
-      when: git_pull.changed
+      when: "git_pull.changed or not venv_folder.stat.exists"
   become_user: "{{ django_stack_gcorn_user }}"
 
 - name: Ensure environment parameters are sufficiently exported
@@ -74,6 +79,7 @@
       virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
     with_items: ["{{ django_stack_manage_post }}"]
     ignore_errors: yes
+    when: database.changed
 
   become_user: "{{ django_stack_gcorn_user }}"
   environment: "{{ django_stack_gunicorn_default_envs|combine(django_stack_gunicorn_opt_envs) }}"
