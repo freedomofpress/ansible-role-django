@@ -60,7 +60,7 @@ django_stack_git_deploy: []
 # django post manage.py tasks
 django_stack_manage_post: []
 
-django_stack_gunicorn_envs:
+django_stack_gunicorn_default_envs:
   DJANGO_DB_USER: "{{ django_db_user }}"
   DJANGO_DB_PASSWORD: "{{ django_db_password }}"
   DJANGO_DB_HOST: "{{ django_db_host }}"
@@ -71,3 +71,4 @@ django_stack_gunicorn_envs:
   DJANGO_MEDIA_ROOT: "{{ django_stack_media_root }}"
   DJANGO_ES_HOST: "{{ django_stack_es_host_url }}"
   DJANGO_ES_CA_PATH: "{{ django_stack_es_ca_path }}"
+django_stack_gunicorn_opt_envs: {}

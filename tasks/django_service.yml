@@ -49,8 +49,9 @@
   lineinfile:
     dest: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/environment"
     line: "{{ item.key }}={{ item.value }}"
-  no_log: True
-  with_dict: "{{ django_stack_gunicorn_envs }}"
+    create: yes
+  no_log: true
+  with_dict: "{{ django_stack_gunicorn_default_envs|combine(django_stack_gunicorn_opt_envs) }}"
   notify: Restart Gunicorn
 
 - block:
@@ -84,4 +85,4 @@
     ignore_errors: yes
 
   become_user: "{{ django_stack_gcorn_user }}"
-  environment: "{{ django_stack_gunicorn_envs }}"
+  environment: "{{ django_stack_gunicorn_default_envs|combine(django_stack_gunicorn_opt_envs) }}"
