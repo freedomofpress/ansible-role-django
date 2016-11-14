@@ -58,6 +58,9 @@ django_stack_git_repo: []
 django_stack_git_deploy: []
 
 # django post manage.py tasks
+django_stack_db_tasks:
+  - migrate
+  - collectstatic
 django_stack_manage_post: []
 
 django_stack_gunicorn_default_envs:
