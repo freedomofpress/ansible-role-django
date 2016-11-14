@@ -83,8 +83,9 @@
     postgresql_databases:
       - name: fpf
         owner: django_user
-    postgresql_user_privilegs:
+    postgresql_user_privileges:
       - name: django_user
+        db: fpf
         priv: "ALL"
         role_attr_flags: "CREATEDB"
     postgresql_ssl: on
@@ -124,7 +125,7 @@
     django_db_user: django_user
     django_db_host: database
     django_db_password: django_password
-    django_stack_gcorn_app_settings: freedompress.settings.production
+    django_stack_app_name: freedompress
     django_secret_key: f1822d2fe58daeadc88e0e4eef2f155fc3edd3713ff9a5d1e27696afd9231d905db51c98dc
     django_stack_es_host_url: https://database:9200
     nginx_sites:
@@ -135,6 +136,7 @@
         - listen 443 ssl
         - location / { proxy_pass http://127.0.0.1:8000/; }
         - location /static { alias /var/www/django-static; }
+        - location /media { alias /var/www/django-media; }
         - ssl_certificate /etc/ssl/certs/{{ansible_fqdn}}.pem
         - ssl_certificate_key /etc/ssl/private/{{ansible_fqdn}}-key.pem
     nodejs_version: "6.x"
@@ -149,3 +151,5 @@
       - transfer_authors
       - transfer_blogs
       - update_index
+    django_stack_npm_commands:
+      - run build

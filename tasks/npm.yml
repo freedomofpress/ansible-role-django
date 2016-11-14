@@ -22,13 +22,15 @@
     raw: cd "{{ django_stack_npm_dir }}" && npm install
     register: npm_install
     #changed_when: "'install' in npm_install.std_out"
-    when: git_pull.changed
+    when: git_pull is undefined or git_pull.changed
 
   - name: Optional npm commands
     shell: "npm {{ item }}"
     args:
       chdir: "{{ django_stack_npm_dir }}"
+      executable: /bin/bash
     with_items: "{{ django_stack_npm_commands }}"
+    when: npm_install is defined and npm_install.changed
 
   - name: Optional shell commands
     shell: "{{ item }}"
