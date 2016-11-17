@@ -54,6 +54,7 @@
   lineinfile:
     dest: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/environment"
     line: "{{ item.key }}={{ item.value }}"
+    regexp: "^{{ item.key }}="
     create: yes
   no_log: true
   with_dict: "{{ django_stack_gunicorn_default_envs|combine(django_stack_gunicorn_opt_envs) }}"
