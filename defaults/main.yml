@@ -62,6 +62,7 @@ django_stack_db_tasks:
   - migrate
   - collectstatic
 django_stack_manage_post: []
+django_stack_manage_pre: []
 
 django_stack_gunicorn_default_envs:
   DJANGO_DB_USER: "{{ django_db_user }}"

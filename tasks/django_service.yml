@@ -61,18 +61,29 @@
   notify: Restart Gunicorn
 
 - block:
-  - name: Database initialization and misc tasks
+  # Designed to only be one once per install
+  - name: Django optional pre db commands
+    django_manage:
+      command: "{{ item }}"
+      app_path: "{{ django_stack_app_dir }}"
+      settings: "{{ django_stack_gcorn_app_settings }}"
+      virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
+    with_items: ["{{ django_stack_manage_pre }}"]
+    ignore_errors: yes
+    when: not venv_folder.stat.exists
+
+  - name: Database migrate and other idempotent tasks
     django_manage:
       command: "{{ item }}"
       app_path: "{{ django_stack_app_dir }}"
       settings: "{{ django_stack_gcorn_app_settings }}"
       virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
     with_items: "{{ django_stack_db_tasks }}"
-    register: database
-    when: not venv_folder.stat.exists or item == 'collectstatic'
+    register: database_register
     notify: Restart Gunicorn
 
-  - name: Django optional post commands
+  # Designed to only be one once per install
+  - name: Django optional post db commands
     django_manage:
       command: "{{ item }}"
       app_path: "{{ django_stack_app_dir }}"
@@ -80,7 +91,7 @@
       virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
     with_items: ["{{ django_stack_manage_post }}"]
     ignore_errors: yes
-    when: database.changed
+    when: not venv_folder.stat.exists
 
   become_user: "{{ django_stack_gcorn_user }}"
   environment: "{{ django_stack_gunicorn_default_envs|combine(django_stack_gunicorn_opt_envs) }}"
