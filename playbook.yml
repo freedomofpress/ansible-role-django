@@ -153,3 +153,5 @@
       - update_index
     django_stack_npm_commands:
       - run build
+    django_stack_gunicorn_opt_envs:
+      DJANGO_ALLOWED_HOSTS: "'*'"
