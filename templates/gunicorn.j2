@@ -12,6 +12,9 @@ ExecStart={{django_stack_gcorn_home}}/{{django_stack_app_name}}/bin/gunicorn \
                     --pid /run/gunicorn/pid  \
                     --bind localhost:{{django_stack_gcorn_port}} \
                     --error-logfile={{ django_stack_gcorn_log}}.error \
+                    --threads {{ django_stack_gcorn_threads}} \
+                    --workers {{ django_stack_gcorn_workers}} \
+                    --log-level {{ django_stack_gcorn_loglevel }} \
                     {{ django_stack_gcorn_app }}
 ExecReload=/bin/kill -s HUP $MAINPID
 ExecStop=/bin/kill -s TERM $MAINPID
