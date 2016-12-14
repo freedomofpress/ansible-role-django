@@ -16,3 +16,4 @@
   with_items:
     - "{{ django_stack_static_root }}"
     - "{{ django_stack_media_root }}"
+    - "/var/log/{{ django_stack_app_name }}"
