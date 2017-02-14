@@ -79,3 +79,8 @@ django_stack_gunicorn_default_envs:
   DJANGO_ES_HOST: "{{ django_stack_es_host_url }}"
   DJANGO_ES_CA_PATH: "{{ django_stack_es_ca_path }}"
 django_stack_gunicorn_opt_envs: {}
+
+# if set to true, force reinstall of npm and pip packages
+# useful for situations were we are disabling the pulling
+# of code via git
+django_stack_force_refresh: false

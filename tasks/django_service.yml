@@ -25,7 +25,7 @@
         virtualenv_python: "{{ django_stack_venv_python }}"
         virtualenv_site_packages: "{{ django_stack_venv_sitepackage }}"
       notify: Restart Gunicorn
-      when: "git_pull.changed or not venv_folder.stat.exists"
+      when: "git_pull.changed or not venv_folder.stat.exists or django_stack_force_refresh"
 
   rescue:
     - name: Setup virtualenv from requirements file
@@ -35,7 +35,7 @@
         executable: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/pip"
         virtualenv_site_packages: "{{ django_stack_venv_sitepackage }}"
       notify: Restart Gunicorn
-      when: "git_pull.changed or not venv_folder.stat.exists"
+      when: "git_pull.changed or not venv_folder.stat.exists or django_stack_force_refresh"
   become_user: "{{ django_stack_gcorn_user }}"
 
 - name: Ensure environment parameters are sufficiently exported
