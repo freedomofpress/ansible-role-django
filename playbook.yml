@@ -152,10 +152,11 @@
         key: "/home/gcorn/.ssh/github_deploy"
     django_stack_manage_post:
       - createdevdata
-      - transfer_authors
-      - transfer_blogs
       - update_index
     django_stack_npm_commands:
       - run build
     django_stack_gunicorn_opt_envs:
       DJANGO_ALLOWED_HOSTS: "'*'"
+      MAILGUN_FAIL_SILENTLY: True
+      DJANGO_JSON_LOG: True
+    django_stack_force_refresh: true
