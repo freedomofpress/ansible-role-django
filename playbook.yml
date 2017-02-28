@@ -6,8 +6,8 @@
   become: yes
   tasks:
     - set_fact:
-        database_ip: "{{ hostvars.database.ansible_eth1.ipv4.address }}"
-        django_ip: "{{ hostvars.djangoserver.ansible_eth1.ipv4.address }}"
+        database_ip: "{{ hostvars.database.ansible_eth0.ipv4.address }}"
+        django_ip: "{{ hostvars.djangoserver.ansible_eth0.ipv4.address }}"
 
     - lineinfile:
         dest: /etc/hosts

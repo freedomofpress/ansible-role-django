@@ -24,10 +24,6 @@ vagrant:
     - name: djangoserver
       ansible_groups:
         - django
-      interfaces:
-        - network_name: private_network
-          type: dhcp
-          auto_config: true
       raw_config_args:
         - "vm.network 'forwarded_port', guest: 443, host: 4443"
         - "vm.network 'forwarded_port', guest: 80, host: 8080"
@@ -35,7 +31,3 @@ vagrant:
     - name: database
       ansible_groups:
         - database
-      interfaces:
-        - network_name: private_network
-          type: dhcp
-          auto_config: true
