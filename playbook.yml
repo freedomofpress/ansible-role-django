@@ -20,6 +20,10 @@
 - name: Establish certs
   hosts: all
   become: yes
+  pre_tasks:
+    - name: Slap in hostnames needed for openssl logic
+      hostname:
+        name: "{{ inventory_hostname }}"
   roles:
     - role: freedomofpress.openssl_node
       tags: ssl-node

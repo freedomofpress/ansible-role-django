@@ -15,6 +15,11 @@ vagrant:
       options:
         memory: 2048
 
+    - name: libvirt
+      type: libvirt
+      options:
+        memory: 2048
+
   instances:
     - name: djangoserver
       ansible_groups:
