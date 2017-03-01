@@ -16,3 +16,13 @@
   with_items:
     - "{{ django_stack_static_root }}"
     - "{{ django_stack_media_root }}"
+    - "{{ django_stack_logdir }}"
+
+- name: Touch log file
+  file:
+    state: touch
+    path: "{{ django_stack_logdir }}/{{ django_stack_logfile }}"
+    owner: "{{ django_stack_gcorn_user }}"
+    group: "{{ django_stack_gcorn_group }}"
+  when: django_stack_logdir != ''
+  changed_when: false

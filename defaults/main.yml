@@ -5,6 +5,8 @@ django_stack_deploy_dir: /var/www/django
 django_stack_app_dir: "{{ django_stack_deploy_dir }}"
 django_stack_static_root: /var/www/django-static
 django_stack_media_root: /var/www/django-media
+django_stack_logdir: "/var/log/{{ django_stack_app_name }}"
+django_stack_logfile: "django.log"
 
 django_stack_gcorn_home: /home/gcorn
 django_stack_gcorn_user: gcorn
