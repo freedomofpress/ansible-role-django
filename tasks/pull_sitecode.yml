@@ -36,3 +36,20 @@
     recursive: "{{ item.recursive|default('yes') }}"
   register: git_pull
   with_items: "{{ django_stack_git_repo }}"
+
+# Conditionally install rsync and copy a specified code directory
+# over to our target server. This logic is INSTEAD of pulling code via git
+- name: Conditionally install rsync
+  package:
+    name: "{{ item }}"
+  with_items: "{{ django_stack_rsync_pkgs }}"
+  when: "not django_stack_git_repo and django_stack_deploy_src"
+
+- name: Conditionally lets rsync the current files up
+  synchronize:
+    dest: "{{ django_stack_deploy_dir }}"
+    src: "{{ django_stack_deploy_src }}"
+    delete: yes
+    rsync_opts:
+      - "--exclude=.git"
+  when: "not django_stack_git_repo and django_stack_deploy_src"
