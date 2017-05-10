@@ -19,7 +19,7 @@
   - name: NPM dependency install
     # ran into a lot of issues using the ansible npm, shell, command modules
     # had to fall back to raw to press forward
-    raw: cd "{{ django_stack_npm_dir }}" && npm install
+    raw: "cd {{ django_stack_npm_dir }} && {{ django_stack_npm_install_cmd }}"
     register: npm_install
     #changed_when: "'install' in npm_install.std_out"
     when: "git_pull is undefined or git_pull.changed or django_stack_force_refresh"

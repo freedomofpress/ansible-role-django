@@ -37,6 +37,7 @@ django_stack_es_host_url: http://localhost:9200
 django_stack_es_ca_path: /etc/ssl/certs/testca_freedom_press.pem
 
 #npm settings
+django_stack_npm_install_cmd: npm install
 django_stack_npm_dir: "{{ django_stack_app_dir }}"
 django_stack_npm_commands: []
 django_stack_npm_global_pkgs: []
