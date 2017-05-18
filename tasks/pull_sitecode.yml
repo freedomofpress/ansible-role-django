@@ -50,6 +50,5 @@
     dest: "{{ django_stack_deploy_dir }}"
     src: "{{ django_stack_deploy_src }}"
     delete: yes
-    rsync_opts:
-      - "--exclude=.git"
+    rsync_opts: "{{ django_stack_rsync_opts }}"
   when: "not django_stack_git_repo and django_stack_deploy_src"

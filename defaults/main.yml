@@ -92,3 +92,6 @@ django_stack_gunicorn_opt_envs: {}
 # useful for situations were we are disabling the pulling
 # of code via git
 django_stack_force_refresh: false
+
+django_stack_rsync_opts:
+  - "--exclude=.git"
