@@ -7,6 +7,7 @@
     recurse: yes
     owner: "{{ django_stack_gcorn_user }}"
     group: "{{ django_stack_gcorn_group }}"
+  changed_when: false
 
 - name: Optional npm global packages
   become: yes
@@ -19,10 +20,11 @@
   - name: NPM dependency install
     # ran into a lot of issues using the ansible npm, shell, command modules
     # had to fall back to raw to press forward
-    raw: cd "{{ django_stack_npm_dir }}" && npm install
+    raw: "cd {{ django_stack_npm_dir }} && {{ django_stack_npm_install_cmd }}"
     register: npm_install
-    #changed_when: "'install' in npm_install.std_out"
-    when: "git_pull is undefined or git_pull.changed or django_stack_force_refresh"
+    when:
+      - "git_pull_result|changed or django_stack_force_refresh"
+      - django_stack_npm_install_cmd != ''
 
   - name: Optional npm commands
     shell: "npm {{ item }}"
@@ -39,6 +41,7 @@
     with_items: "{{ django_stack_shell_commands }}"
 
   become_user: "{{ django_stack_gcorn_user }}"
+  become: yes
   environment:
     NODE_ENV: production
     NODE_PATH: /usr/lib/nodejs:/usr/lib/node_modules:/usr/share/javascript:/usr/local/lib/npm/lib/node_modules

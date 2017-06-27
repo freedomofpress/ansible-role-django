@@ -6,74 +6,148 @@ other roles on the internetz were attempting to be all encompassing roles where-
 I'd like to take advantage of many third-party and internal roles for handling
 things like postgres, nginx, etc.
 
-This role is not tied to a specific django repo, so you'll have to specify
- via environment or ansible variable.
+This role is not tied to a specific django repo and its designed to be flexible,
+a lot of the flexibility plays out via ansible variables. For local testing and CI
+purposes, this repo is being tested against [littleweaverweb.com's repository].
 
 Requirements
 ------------
 
 These are the following system requirements:
 
-* vagrant
-* ansible >= 2.2.x
-* molecule
+* python2.7+
+* virtualenv
+* make
+* docker
 
-Easy way to install the last two is to utilize a virtualenv and install with:
+Role Variables
+--------------
 
-```bash
-$ pip install -r requirements.txt
 ```
+# defaults file for fpf-django-stack
+django_stack_app_name: fpf
+django_stack_deploy_dir: /var/www/django
+django_stack_app_dir: "{{ django_stack_deploy_dir }}"
+django_stack_static_root: /var/www/django-static
+django_stack_media_root: /var/www/django-media
+django_stack_logdir: "/var/log/{{ django_stack_app_name }}"
+django_stack_logfile: "django.log"
+
+django_stack_gcorn_home: /home/gcorn
+django_stack_gcorn_user: gcorn
+django_stack_gcorn_group: gcorn
+django_stack_gcorn_port: 8000
+django_stack_gcorn_log: "/var/log/{{django_stack_app_name}}/app"
+django_stack_gcorn_app: "{{django_stack_app_name}}.wsgi"
+django_stack_gcorn_app_settings: "{{django_stack_app_name}}.settings.production"
+# if filed out copy this local config to the path defined above
+django_stack_override_config: ''
+django_stack_gcorn_workers: 8
+django_stack_gcorn_threads: 4
+django_stack_gcorn_loglevel: info
+
+# virtualenv and pip
+django_stack_venv_python: python3
+django_stack_venv_sitepackage: no
+django_stack_optional_pip: []
+# - name: django
+#   python: python2
+
+# database settings
+django_db_user: django_user
+django_db_password: django_password
+django_db_host: localhost
+django_db_port: 5432
+
+#elasticsearch
+django_stack_es_host_url: http://localhost:9200
+django_stack_es_ca_path: /etc/ssl/certs/testca_freedom_press.pem
+
+#npm settings
+django_stack_npm_install_cmd: npm install
+django_stack_npm_dir: "{{ django_stack_app_dir }}"
+django_stack_npm_commands: []
+django_stack_npm_global_pkgs: []
+django_stack_shell_commands: []
+
+django_stack_pkgs:
+  - gcc
+  - g++
+  - python3
+  - python3-dev
+  - virtualenv
+  - libxml2-dev
+  - libxslt-dev
+  - zlib1g-dev
+  - libjpeg-dev
+  - libpq-dev
+  - libffi-dev
+
+django_stack_git_pkgs:
+  - git
+
+# Git code parameters
+django_stack_git_repo: []
+django_stack_git_deploy: []
+
+# rsync code parameters
+django_stack_rsync_pkgs:
+  - rsync
+django_stack_deploy_src: ""
+
+# django post manage.py tasks
+django_stack_db_tasks:
+  - migrate
+  - collectstatic
+django_stack_manage_post: []
+django_stack_manage_pre: []
+
+# These will only work if you have a django settings file that
+# takes advantage of these environment variables
+django_stack_gunicorn_default_envs:
+  DJANGO_DB_USER: "{{ django_db_user }}"
+  DJANGO_DB_PASSWORD: "{{ django_db_password }}"
+  DJANGO_DB_HOST: "{{ django_db_host }}"
+  DJANGO_DB_PORT: "{{ django_db_port }}"
+  DJANGO_SECRET_KEY: "{{ django_secret_key }}"
+  DJANGO_SETTINGS_MODULE: "{{ django_stack_gcorn_app_settings }}"
+  DJANGO_STATIC_ROOT: "{{ django_stack_static_root }}"
+  DJANGO_MEDIA_ROOT: "{{ django_stack_media_root }}"
+  DJANGO_ES_HOST: "{{ django_stack_es_host_url }}"
+  DJANGO_ES_CA_PATH: "{{ django_stack_es_ca_path }}"
+django_stack_gunicorn_opt_envs: {}
+
+# if set to true, force reinstall of npm and pip packages
+# useful for situations were we are disabling the pulling
+# of code via git
+django_stack_force_refresh: false
+
+django_stack_rsync_opts:
+  - "--exclude=.git"
+```
+
 
 Getting started for local deployment
 ------------------------------------
 
-Take note of the git url code-base you are going to be working from.
-This has to be in [ansible git repo](https://docs.ansible.com/ansible/git_module.html).
+In order to run a test of the role itself, easiest thing to do is run `make`
+which will kick-off a local deployment of the `littleweaverweb` repo against a
+docker container.
 
-An example is: `ssh://git@github.com/myorg/mysite.com.git`. If you are using a
-publically visible git repo, you should set the following in your playbook:
+If you want to experiment with your own site repo, you'll either have to start
+folding this role into your deployment playbook and experiment there or start
+making local edits to `devops/playbook.yml` accordingly.
 
-```yaml
-django_stack_git_deploy: []
-```
+Deployment options
+------------------
+There are two primary otions for deploying your django code-base to the
+server in question:
 
-Once you got that sorted out, from a terminal sitting in this directory:
-
-```bash
-# the first run you are going to need to run these two commands
-# replace DJANGO_GIT_REPO url with your django repo
-$ export DJANGO_GIT_REPO=ssh://git@github.com/myorg/mysite.com.git
-$ ./setup.sh 
-
-# copy a read-only deploy key to ./deploy_key if applicable
-$ cp ~/.ssh/github_deploy ./deploy_key
-$ molecule converge
-```
-
-What happened here ^^^?
-* Ansible galaxy dependencies were pulled into `roles/`
-* the vagrant box is fired up and local `playbook.yml` is run
-
-Should then be able to fire up a web-browser and hit:
-`http://localhost:8080/`
-
-
-Dependencies
-------------
-
-For local development dependencies are located in `requirements.yml` and
-installed when running the `setup.sh` script.
-
-When utilized as a role, as part of a larger ansible environment, these dependencies are *not*
-defined in the meta folder. This was intentional design. Soo you would
-have to go through and manually integrate your own dependencies or copy the
-`requirements.yml` and install to your global roles path. It is recommended you
-utilize the `playbook.yml` located at the root of this repo as a reference.
-
-Example Playbook
-----------------
-Check out `./playbook.yml` when using this role in deployment. This is the
-playbook that the vagrant provisioning and molecule testing will run off.
+* Utilizing git so that the server will pull the repo's code-base. This requires
+  defining parameters in `django_stack_git_repo`. You can optionally also
+  deploy a ssh-key that will be utilized to authenticate to a private repo via
+  `django_stack_git_deploy`.
+* rsync a local copy of the code-base up to the server via `django_stack_deploy_src`.
 
 License
 -------
@@ -84,3 +158,5 @@ Author Information
 ------------------
 
 Michael Sheinberg <mike@freedom.press>
+
+[littleweaverweb.com's repository](https://github.com/littleweaver/littleweaverweb.com)

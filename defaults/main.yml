@@ -15,6 +15,8 @@ django_stack_gcorn_port: 8000
 django_stack_gcorn_log: "/var/log/{{django_stack_app_name}}/app"
 django_stack_gcorn_app: "{{django_stack_app_name}}.wsgi"
 django_stack_gcorn_app_settings: "{{django_stack_app_name}}.settings.production"
+# if filed out copy this local config to the path defined above
+django_stack_override_config: ''
 django_stack_gcorn_workers: 8
 django_stack_gcorn_threads: 4
 django_stack_gcorn_loglevel: info
@@ -37,6 +39,7 @@ django_stack_es_host_url: http://localhost:9200
 django_stack_es_ca_path: /etc/ssl/certs/testca_freedom_press.pem
 
 #npm settings
+django_stack_npm_install_cmd: npm install
 django_stack_npm_dir: "{{ django_stack_app_dir }}"
 django_stack_npm_commands: []
 django_stack_npm_global_pkgs: []
@@ -62,6 +65,11 @@ django_stack_git_pkgs:
 django_stack_git_repo: []
 django_stack_git_deploy: []
 
+# rsync code parameters
+django_stack_rsync_pkgs:
+  - rsync
+django_stack_deploy_src: ""
+
 # django post manage.py tasks
 django_stack_db_tasks:
   - migrate
@@ -86,3 +94,6 @@ django_stack_gunicorn_opt_envs: {}
 # useful for situations were we are disabling the pulling
 # of code via git
 django_stack_force_refresh: false
+
+django_stack_rsync_opts:
+  - "--exclude=.git"
