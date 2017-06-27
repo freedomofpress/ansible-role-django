@@ -1,0 +1,58 @@
+---
+
+- name: Run django environment
+  hosts: django
+  pre_tasks:
+    - name: Add pax flags
+      lineinfile:
+        dest: "/etc/paxctld.conf"
+        line: "{{ item }}  m"
+        regexp: "^{{ item }}"
+      with_items:
+        - /usr/bin/nodejs
+        - /home/gcorn/littleweaverweb/bin/pip
+      notify: restart paxctld
+
+    - meta:  flush_handlers
+  roles:
+    - role: django_stack
+      tags: django
+  vars:
+    django_stack_superuser_admin: admin
+    django_stack_superuser_email: mike@freedom.press
+    django_db_user: django_user
+    django_db_password: django_password
+    django_stack_app_name: littleweaverweb
+    django_secret_key: f1822d2fe58daeadc88e0e4eef2f155fc3edd3713ff9a5d1e27696afd9231d905db51c98dc
+    django_stack_es_host_url: disable
+    django_stack_npm_install_cmd: ''
+    django_stack_gcorn_workers: 1
+    django_stack_gcorn_threads: 1
+    django_stack_gunicorn_opt_envs:
+      DJANGO_ALLOWED_HOSTS: "'*'"
+      DJANGO_SETTINGS_MODULE: littleweaverweb.settings.local
+      DJANGO_DB_NAME: pressfreedom
+      DJANGO_DB_USER: django_user
+      DJANGO_DB_PASSWORD: django_password
+      DJANGO_DB_PORT: 5432
+      DJANGO_STATIC_ROOT: /var/www/django-static
+      DJANGO_MEDIA_ROOT: /var/www/django-media
+    django_stack_gcorn_app_settings: littleweaverweb.settings.local
+    #django_stack_force_refresh: true
+    # The default packages are preinstalled on the base dockerimage
+    django_stack_pkgs:
+      - python-dev
+    django_stack_git_repo:
+      - url: "https://github.com/littleweaver/littleweaverweb.com.git"
+        force: yes
+        branch: e45ce0e27d81279906559afb519983a8f0417d68
+    django_stack_npm_global_pkgs:
+      - autoprefixer
+      - postcss-cli
+    django_stack_venv_python: python2
+    django_stack_override_config: local.py
+  handlers:
+    - name: restart paxctld
+      service:
+        name: paxctld
+        state: restarted
