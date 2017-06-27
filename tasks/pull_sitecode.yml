@@ -34,8 +34,11 @@
     force: "{{ item.force|default(omit) }}"
     accept_hostkey: "{{ item.accept_hostkey|default('yes') }}"
     recursive: "{{ item.recursive|default('yes') }}"
-  register: git_pull
+  register: git_pull_result
   with_items: "{{ django_stack_git_repo }}"
+
+- set_fact:
+    git_pull_result: "{{ git_pull_result|default({'changed': False) }}"
 
 # Conditionally install rsync and copy a specified code directory
 # over to our target server. This logic is INSTEAD of pulling code via git
@@ -51,4 +54,6 @@
     src: "{{ django_stack_deploy_src }}"
     delete: yes
     rsync_opts: "{{ django_stack_rsync_opts }}"
-  when: "not django_stack_git_repo and django_stack_deploy_src"
+  when:
+    - not django_stack_git_repo
+    - django_stack_deploy_src
