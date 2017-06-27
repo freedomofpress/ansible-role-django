@@ -7,6 +7,7 @@
     recurse: yes
     owner: "{{ django_stack_gcorn_user }}"
     group: "{{ django_stack_gcorn_group }}"
+  changed_when: false
 
 - name: Optional npm global packages
   become: yes
