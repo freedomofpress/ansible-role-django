@@ -15,6 +15,8 @@ django_stack_gcorn_port: 8000
 django_stack_gcorn_log: "/var/log/{{django_stack_app_name}}/app"
 django_stack_gcorn_app: "{{django_stack_app_name}}.wsgi"
 django_stack_gcorn_app_settings: "{{django_stack_app_name}}.settings.production"
+# if filed out copy this local config to the path defined above
+django_stack_override_config: ''
 django_stack_gcorn_workers: 8
 django_stack_gcorn_threads: 4
 django_stack_gcorn_loglevel: info
