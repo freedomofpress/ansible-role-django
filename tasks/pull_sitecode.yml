@@ -56,7 +56,7 @@
     rsync_opts: "{{ django_stack_rsync_opts }}"
   when:
     - not django_stack_git_repo
-    - django_stack_deploy_src
+    - "not django_stack_deploy_src == ''"
 
 - name: Optional copy over local django settings
   copy:
