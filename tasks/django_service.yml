@@ -19,13 +19,14 @@
     path: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
   register: venv_folder
 
-- name: Create virtualenv and ensure latest pip installed
+- name: Create virtualenv and ensure base packages installed
   pip:
-    name: pip
+    name: "{{ item }}"
     virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
     virtualenv_python: "{{ django_stack_venv_python }}"
     virtualenv_site_packages: "{{ django_stack_venv_sitepackage }}"
     extra_args: "-U"
+  with_items: "{{ ['pip'] + django_stack_venv_base_pkgs }}"
   become_user: "{{ django_stack_gcorn_user }}"
 
 - name: Setup virtualenv from requirements file

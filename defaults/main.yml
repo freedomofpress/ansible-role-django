@@ -24,6 +24,7 @@ django_stack_gcorn_loglevel: info
 # virtualenv and pip
 django_stack_venv_python: python3
 django_stack_venv_sitepackage: no
+django_stack_venv_base_pkgs: []
 django_stack_optional_pip: []
 # - name: django
 #   python: python2
