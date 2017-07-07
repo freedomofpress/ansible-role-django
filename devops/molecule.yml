@@ -10,7 +10,7 @@ driver:
 
 docker:
   containers:
-    - name: prod
+    - name: django_stack_prod
       ansible_groups:
         - django
         - database
@@ -20,7 +20,7 @@ docker:
       command: /lib/systemd/systemd
       privileged: True
       port_bindings:
-        443: 4443
+        443: 4444
       volume_mounts:
         - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
 

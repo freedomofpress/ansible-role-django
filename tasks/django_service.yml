@@ -19,26 +19,25 @@
     path: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
   register: venv_folder
 
-- block:
-    - name: Setup virtualenv from requirements file
-      pip:
-        requirements: "{{ django_stack_app_dir }}/requirements.txt"
-        virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
-        virtualenv_python: "{{ django_stack_venv_python }}"
-        virtualenv_site_packages: "{{ django_stack_venv_sitepackage }}"
-      notify: Restart Gunicorn
-      when: "git_pull_result|changed or not venv_folder.stat.exists or django_stack_force_refresh"
+- name: Create virtualenv and ensure base packages installed
+  pip:
+    name: "{{ item }}"
+    virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
+    virtualenv_python: "{{ django_stack_venv_python }}"
+    virtualenv_site_packages: "{{ django_stack_venv_sitepackage }}"
+    extra_args: "-U"
+  with_items: "{{ ['pip'] + django_stack_venv_base_pkgs }}"
+  become_user: "{{ django_stack_gcorn_user }}"
 
-  rescue:
-    - name: Setup virtualenv from requirements file
-      pip:
-        requirements: "{{ django_stack_app_dir }}/requirements.txt"
-        virtualenv_python: "{{ django_stack_venv_python }}"
-        executable: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/pip"
-        virtualenv_site_packages: "{{ django_stack_venv_sitepackage }}"
-      notify: Restart Gunicorn
-      when: "git_pull_result|changed or not venv_folder.stat.exists or django_stack_force_refresh"
-  become: yes
+- name: Setup virtualenv from requirements file
+  pip:
+    requirements: "{{ django_stack_app_dir }}/requirements.txt"
+    virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
+    virtualenv_python: "{{ django_stack_venv_python }}"
+    virtualenv_site_packages: "{{ django_stack_venv_sitepackage }}"
+    extra_args: "-U --upgrade-strategy only-if-needed"
+  notify: Restart Gunicorn
+  when: "git_pull_register.changed or not venv_folder.stat.exists or django_stack_force_refresh"
   become_user: "{{ django_stack_gcorn_user }}"
 
 - name: Ensure environment parameters are sufficiently exported
@@ -94,5 +93,4 @@
     when: not venv_folder.stat.exists
 
   become_user: "{{ django_stack_gcorn_user }}"
-  become: yes
   environment: "{{ django_venv_vars }}"
