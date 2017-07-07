@@ -11,4 +11,4 @@ curdir="$(dirname $(realpath "$0") )"
 source "${curdir}/../.venv/bin/activate"
 
 echo "##### Run Tests"
-testinfra --connection=docker --hosts=prod ${curdir}/../tests/
+testinfra --connection=docker --hosts=django_stack_prod ${curdir}/../tests/
