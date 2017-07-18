@@ -10,4 +10,4 @@ tests:
 
 .PHONY: teardown
 teardown:
-	docker kill prod && docker rm -f prod
+	docker rm -f django_stack_prod
