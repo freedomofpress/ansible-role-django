@@ -42,7 +42,7 @@
 
   become_user: "{{ django_stack_gcorn_user }}"
   become: yes
+  no_log: "{{ django_stack_npm_no_log }}"
   environment:
     NODE_ENV: production
     NODE_PATH: /usr/lib/nodejs:/usr/lib/node_modules:/usr/share/javascript:/usr/local/lib/npm/lib/node_modules
-

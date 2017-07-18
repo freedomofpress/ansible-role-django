@@ -51,6 +51,9 @@
       - postcss-cli
     django_stack_venv_python: python2
     django_stack_override_config: local.py
+    # Lets restrict output
+    django_stack_global_no_log: yes
+
   handlers:
     - name: restart paxctld
       service:
