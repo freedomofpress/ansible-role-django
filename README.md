@@ -23,7 +23,7 @@ These are the following system requirements:
 Role Variables
 --------------
 
-```
+```yaml
 # defaults file for fpf-django-stack
 django_stack_app_name: fpf
 django_stack_deploy_dir: /var/www/django
@@ -46,9 +46,15 @@ django_stack_gcorn_workers: 8
 django_stack_gcorn_threads: 4
 django_stack_gcorn_loglevel: info
 
+# If you want to try to keep output to a minimum, toggle this on.
+# For example, in CI verbose built output can obscure relevant test info.
+django_stack_global_no_log: no
+
 # virtualenv and pip
 django_stack_venv_python: python3
 django_stack_venv_sitepackage: no
+django_stack_venv_no_log: "{{ django_stack_global_no_log }}"
+django_stack_venv_base_pkgs: []
 django_stack_optional_pip: []
 # - name: django
 #   python: python2
@@ -68,6 +74,7 @@ django_stack_npm_install_cmd: npm install
 django_stack_npm_dir: "{{ django_stack_app_dir }}"
 django_stack_npm_commands: []
 django_stack_npm_global_pkgs: []
+django_stack_npm_no_log: "{{ django_stack_global_no_log }}"
 django_stack_shell_commands: []
 
 django_stack_pkgs:
@@ -93,6 +100,7 @@ django_stack_git_deploy: []
 # rsync code parameters
 django_stack_rsync_pkgs:
   - rsync
+django_stack_rsync_no_log: "{{ django_stack_global_no_log }}"
 django_stack_deploy_src: ""
 
 # django post manage.py tasks
@@ -100,10 +108,10 @@ django_stack_db_tasks:
   - migrate
   - collectstatic
 django_stack_manage_post: []
+django_stack_manage_post_ignore: yes
 django_stack_manage_pre: []
+django_stack_manage_no_log: "{{ django_stack_global_no_log }}"
 
-# These will only work if you have a django settings file that
-# takes advantage of these environment variables
 django_stack_gunicorn_default_envs:
   DJANGO_DB_USER: "{{ django_db_user }}"
   DJANGO_DB_PASSWORD: "{{ django_db_password }}"
