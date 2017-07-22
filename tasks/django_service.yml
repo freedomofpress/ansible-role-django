@@ -26,6 +26,7 @@
     virtualenv_python: "{{ django_stack_venv_python }}"
     virtualenv_site_packages: "{{ django_stack_venv_sitepackage }}"
     extra_args: "-U"
+  no_log: "{{ django_stack_venv_no_log }}"
   with_items: "{{ ['pip'] + django_stack_venv_base_pkgs }}"
   become_user: "{{ django_stack_gcorn_user }}"
 
@@ -36,6 +37,7 @@
     virtualenv_python: "{{ django_stack_venv_python }}"
     virtualenv_site_packages: "{{ django_stack_venv_sitepackage }}"
     extra_args: "-U --upgrade-strategy only-if-needed"
+  no_log: "{{ django_stack_venv_no_log }}"
   notify: Restart Gunicorn
   when: "git_pull_register.changed or not venv_folder.stat.exists or django_stack_force_refresh"
   become_user: "{{ django_stack_gcorn_user }}"
@@ -78,6 +80,7 @@
       settings: "{{ django_stack_gcorn_app_settings }}"
       virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
     with_items: "{{ django_stack_db_tasks }}"
+    no_log: "{{ django_stack_manage_no_log }}"
     register: database_register
     notify: Restart Gunicorn
 

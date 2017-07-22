@@ -54,6 +54,7 @@
     src: "{{ django_stack_deploy_src }}"
     delete: yes
     rsync_opts: "{{ django_stack_rsync_opts }}"
+  no_log: "{{ django_stack_rsync_no_log }}"
   when:
     - not django_stack_git_repo
     - "not django_stack_deploy_src == ''"
