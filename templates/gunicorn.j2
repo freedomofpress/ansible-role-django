@@ -1,17 +1,17 @@
 [Unit]
-Description=gunicorn daemon
+Description=gunicorn {{django_stack_active_gcorn_svc}} daemon
 After=network.target
 
 [Service]
-PIDFile=/run/gunicorn/pid
+PIDFile=/run/gunicorn-{{django_stack_active_gcorn_svc}}/pid
 User={{ django_stack_gcorn_user }}
 Group={{ django_stack_gcorn_group }}
-EnvironmentFile={{django_stack_gcorn_home}}/{{django_stack_app_name}}/bin/environment
-WorkingDirectory={{ django_stack_app_dir }}
-ExecStart={{django_stack_gcorn_home}}/{{django_stack_app_name}}/bin/gunicorn \
-                    --pid /run/gunicorn/pid  \
-                    --bind localhost:{{django_stack_gcorn_port}} \
-                    --error-logfile={{ django_stack_gcorn_log}}.error \
+EnvironmentFile={{ django_stack_venv_env_file }}
+WorkingDirectory={{ active_deploy_dir }}
+ExecStart={{ django_stack_venv_dir }}/bin/gunicorn \
+                    --pid /run/gunicorn-{{django_stack_active_gcorn_svc}}/pid \
+                    --bind localhost:{{django_stack_gcorn_ports[django_stack_active_gcorn_svc]}} \
+                    --error-logfile={{django_stack_gcorn_log}}-{{django_stack_active_gcorn_svc}}.error \
                     --threads {{ django_stack_gcorn_threads}} \
                     --workers {{ django_stack_gcorn_workers}} \
                     --log-level {{ django_stack_gcorn_loglevel }} \

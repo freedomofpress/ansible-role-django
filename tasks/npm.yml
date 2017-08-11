@@ -1,14 +1,4 @@
 ---
-
-- name: Ensure npm has permissions to write
-  file:
-    state: directory
-    path: "{{ django_stack_npm_dir }}"
-    recurse: yes
-    owner: "{{ django_stack_gcorn_user }}"
-    group: "{{ django_stack_gcorn_group }}"
-  changed_when: false
-
 - name: Optional npm global packages
   become: yes
   npm:
@@ -17,32 +7,34 @@
   with_items: "{{ django_stack_npm_global_pkgs }}"
 
 - block:
-  - name: NPM dependency install
-    # ran into a lot of issues using the ansible npm, shell, command modules
-    # had to fall back to raw to press forward
-    raw: "cd {{ django_stack_npm_dir }} && {{ django_stack_npm_install_cmd }}"
-    register: npm_install
-    when:
-      - "git_pull_result|changed or django_stack_force_refresh"
-      - django_stack_npm_install_cmd != ''
+    - name: If grsec, add paxflags cmd to node
+      set_fact:
+        node_grsec_image: "node_grsec"
+      when: ansible_kernel.endswith('grsec')
 
-  - name: Optional npm commands
-    shell: "npm {{ item }}"
-    args:
-      chdir: "{{ django_stack_npm_dir }}"
-      executable: /bin/bash
-    with_items: "{{ django_stack_npm_commands }}"
-    when: "npm_install is defined and npm_install.changed"
+    - name: Prepare node image with pax flags
+      docker_image:
+        name: "node_grsec:{{ django_stack_node_ver }}"
+        dockerfile: "{{ role_path }}/docker/NodeDockerfile"
+        path: ../../
+        tag: "{{ django_stack_node_ver }}"
+      when: ansible_kernel.endswith('grsec')
 
-  - name: Optional shell commands
-    shell: "{{ item }}"
-    args:
-      chdir: "{{ django_stack_npm_dir }}"
-    with_items: "{{ django_stack_shell_commands }}"
+    - name: Node local docker builder
+      docker_container:
+        name: pf_tracker_node
+        image: "{{ node_grsec_image|default('node') }}:{{ django_stack_node_ver }}"
+        volumes:
+          - "{{ tmp_dir_git }}:{{ active_deploy_dir }}"
+          - "{{ tmp_dir }}:/status"
+        state: started
+        working_dir: "{{ active_deploy_dir }}"
+        command: /bin/ash -c "{{ django_stack_npm_install_cmd }}; touch /status/npm.done"
+        user: node
+        recreate: yes
 
-  become_user: "{{ django_stack_gcorn_user }}"
-  become: yes
-  no_log: "{{ django_stack_npm_no_log }}"
-  environment:
-    NODE_ENV: production
-    NODE_PATH: /usr/lib/nodejs:/usr/lib/node_modules:/usr/share/javascript:/usr/local/lib/npm/lib/node_modules
+    - name: Wait for node logic to finish up
+      wait_for:
+        path: "{{ tmp_dir }}/npm.done"
+  become: no
+  delegate_to: localhost

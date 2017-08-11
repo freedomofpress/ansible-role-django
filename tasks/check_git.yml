@@ -1,0 +1,27 @@
+---
+- name: Check for existing deploy folder
+  stat:
+    path: "{{ existing_django_deploy_dir }}/.git"
+  register: existing_deploy_folder_results
+
+- name: Scrape existing git tag from server
+  command: git rev-parse HEAD
+  args:
+    chdir: "{{ existing_django_deploy_dir }}"
+  changed_when: false
+  register: orig_git_hash_results
+  no_log: true
+  ignore_errors: true
+
+- name: Check for pre-existing stats on requirements.txt file
+  stat:
+    path: "{{ existing_django_deploy_dir }}/requirements.txt"
+    checksum_algorithm: sha256
+    get_md5: false
+  register: orig_req_file_results
+  check_mode: no
+
+- name: Establish existing requirements and git check results
+  set_fact:
+    orig_py_reqs: "{{ orig_req_file_results.stat.checksum | default('') }}"
+    orig_git_hash: "{{ orig_git_hash_results.stdout | default('') }}"

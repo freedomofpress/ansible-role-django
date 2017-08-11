@@ -1,68 +1,82 @@
 ---
-
-- name: Ensure git dependencies exist
-  package:
-    name: "{{ item }}"
-  with_items: "{{ django_stack_git_pkgs }}"
-
-- name: Ensure key dest folders exist
-  file:
-    state: directory
-    dest: "{{ item.dest|default(django_stack_gcorn_home+'/.ssh/') }}"
-    owner: "{{ item.owner|default(django_stack_gcorn_user) }}"
-    group: "{{ item.group|default(django_stack_gcorn_group) }}"
-    mode: "{{ item.mode|default(0700) }}"
-  with_items: "{{ django_stack_git_deploy }}"
-  no_log: true
-
-- name: Lay-down git deploy keys
-  copy:
-    dest: "{{ item.dest|default(django_stack_gcorn_home+'/.ssh/github_deploy') }}"
-    content: "{{ item.key }}"
-    owner: "{{ item.owner|default(django_stack_gcorn_user) }}"
-    group: "{{ item.group|default(django_stack_gcorn_group) }}"
-    mode: "{{ item.mode|default(0700) }}"
-  with_items: "{{ django_stack_git_deploy }}"
-  no_log: true
-
-- name: Pull down site code
-  git:
-    repo: "{{ item.url }}"
-    version: "{{ item.branch|default('master') }}"
-    dest: "{{ item.dest|default(django_stack_deploy_dir) }}"
-    key_file: "{{ item.key|default(omit) }}"
-    force: "{{ item.force|default(omit) }}"
-    accept_hostkey: "{{ item.accept_hostkey|default('yes') }}"
-    recursive: "{{ item.recursive|default('yes') }}"
-  register: git_pull_register
-  with_items: "{{ django_stack_git_repo }}"
-
-- set_fact:
-    git_pull_result: "{{ git_pull_register|default({'changed': False}) }}"
-
-# Conditionally install rsync and copy a specified code directory
-# over to our target server. This logic is INSTEAD of pulling code via git
-- name: Conditionally install rsync
+- name: Install rsync
   package:
     name: "{{ item }}"
   with_items: "{{ django_stack_rsync_pkgs }}"
-  when: "not django_stack_git_repo and django_stack_deploy_src"
 
-- name: Conditionally lets rsync the current files up
-  synchronize:
-    dest: "{{ django_stack_deploy_dir }}"
-    src: "{{ django_stack_deploy_src }}"
-    delete: yes
-    rsync_opts: "{{ django_stack_rsync_opts }}"
-  no_log: "{{ django_stack_rsync_no_log }}"
+- block:
+    - name: Pull down site code
+      local_action: git
+      args:
+        repo: "{{ item.url }}"
+        version: "{{ item.branch|default('master') }}"
+        dest: "{{ tmp_dir_git }}"
+        force: "{{ item.force|default(omit) }}"
+        accept_hostkey: "{{ item.accept_hostkey|default('yes') }}"
+        recursive: "{{ item.recursive|default('yes') }}"
+      changed_when: false
+      with_items: "{{ django_stack_git_repo }}"
+      when:
+        - django_stack_deploy_src == ''
+
+    - name: Conditionally rsync local git repo dir for docker usage
+      synchronize:
+        dest: "{{ tmp_dir_git }}/"
+        src: "{{ django_stack_deploy_src }}"
+        delete: yes
+        rsync_opts: "{{ django_stack_rsync_opts }}"
+      changed_when: false
+      no_log: "{{ django_stack_rsync_no_log }}"
+      when:
+        - not django_stack_git_repo
+        - "not django_stack_deploy_src == ''"
+
+    - name: Optional copy over local django settings
+      copy:
+        src: "{{ django_stack_override_config }}"
+        dest: "{{ tmp_dir_git }}/{{ django_stack_gcorn_app_settings | replace('.','/') }}.py"
+      changed_when: false
+      when: "django_stack_override_config != ''"
+
+    - name: Get latest git hash
+      command: git rev-parse HEAD
+      args:
+        chdir: "{{ tmp_dir_git }}"
+      changed_when: false
+      register: latest_git_hash_results
+
+    - name: Check hash of current requirements.txt file
+      stat:
+        path: "{{ tmp_dir_git }}/requirements.txt"
+        checksum_algorithm: sha256
+        get_md5: false
+      register: current_req_file_results
+      check_mode: no
+
+  become: no
+  delegate_to: localhost
+
+- set_fact:
+    git_pull_result: "{{ git_pull_register|default({'changed': False}) }}"
+    current_git_hash: "{{ latest_git_hash_results.stdout }}"
+    current_py_reqs: "{{ current_req_file_results.stat.checksum }}"
+
+- name: Swap active service target
+  set_fact:
+    django_stack_active_gcorn_svc: "{{ item.key }}"
+  with_dict: "{{ django_stack_gcorn_ports }}"
   when:
-    - not django_stack_git_repo
-    - "not django_stack_deploy_src == ''"
+    - "item.key != ansible_local.active_gunicorn_svc.django.name"
+    - current_git_hash != orig_git_hash
+    - not django_first_install
 
-- name: Optional copy over local django settings
-  copy:
-    src: "{{ django_stack_override_config }}"
-    dest: "{{ django_stack_deploy_dir }}/{{ django_stack_gcorn_app_settings | replace('.','/') }}.py"
-    owner: "{{ django_stack_gcorn_user }}"
-    group: "{{ django_stack_gcorn_group }}"
-  when: "django_stack_override_config != ''"
+- name: Update active svc remote fact
+  ini_file:
+    dest: /etc/ansible/facts.d/active_gunicorn_svc.fact
+    section: django
+    option: name
+    value: "{{ django_stack_active_gcorn_svc }}"
+
+- set_fact:
+    django_stack_venv_dir: "{{django_stack_gcorn_home}}/{{django_stack_app_name}}-{{django_stack_active_gcorn_svc}}"
+    active_deploy_dir: "{{ django_stack_deploy_dir }}-{{ django_stack_active_gcorn_svc }}"

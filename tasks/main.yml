@@ -1,16 +1,27 @@
 ---
 
 - include: setup.yml
-  tags: ['always']
+  tags: always
+
+- include: check_git.yml
 
 - include: pull_sitecode.yml
-  tags: ['git']
 
 - include: npm.yml
-  tags: ['npm']
+  when:
+    - current_git_hash != orig_git_hash
+    - django_stack_npm_install_cmd != ""
+
+- include: build-venv.yml
+  when:
+    - current_git_hash != orig_git_hash
+
+- include: push_sitecode.yml
+  when:
+    - current_git_hash != orig_git_hash
 
 - include: django_service.yml
-  tags: ['django']
+  tags: django
 
 - include: gunicorn.yml
-  tags: ['gunicorn']
+  tags: gunicorn

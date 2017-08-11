@@ -2,5 +2,10 @@
 
 - name: Restart Gunicorn
   service:
-    name: gunicorn
+    name: "gunicorn-{{ django_stack_active_gcorn_svc }}"
     state: restarted
+
+- name: reload nginx
+  service:
+    name: nginx
+    state: reloaded

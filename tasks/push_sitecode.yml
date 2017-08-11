@@ -1,0 +1,10 @@
+---
+- name: Push codebase to remote server's active dir
+  synchronize:
+    src: "{{ tmp_dir }}/git/"
+    dest: "{{ active_deploy_dir }}/"
+    recursive: yes
+    perms: yes
+    delete: yes
+  become_user: "{{ django_stack_gcorn_user }}"
+  become: yes

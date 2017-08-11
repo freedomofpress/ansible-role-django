@@ -1,4 +1,13 @@
 ---
+- name: Get current active django service
+  set_fact:
+    django_stack_active_gcorn_svc: "{{ ansible_local.active_gunicorn_svc.django.name }}"
+  when: ansible_local is defined
+
+- name: Set variable for existing deploy dir checks
+  set_fact:
+    existing_django_deploy_dir: "{{django_stack_deploy_dir}}-{{django_stack_active_gcorn_svc}}"
+    current_venv_dir: "{{django_stack_gcorn_home}}/{{django_stack_app_name}}-{{django_stack_active_gcorn_svc}}"
 
 - name: Configure gunicorn user
   user:
@@ -18,6 +27,15 @@
     - "{{ django_stack_media_root }}"
     - "{{ django_stack_logdir }}"
 
+- name: Establish code directories
+  file:
+    path: "{{ django_stack_deploy_dir }}-{{ item }}"
+    state: directory
+    owner: "{{ django_stack_gcorn_user }}"
+    group: "{{ django_stack_gcorn_group }}"
+  with_items: "{{ django_stack_gcorn_ports.keys() }}"
+  register: check_first_time_results
+
 - name: Touch log file
   file:
     state: touch
@@ -26,3 +44,40 @@
     group: "{{ django_stack_gcorn_group }}"
   when: django_stack_logdir != ''
   changed_when: false
+
+- name: Establish remote fact directory
+  file:
+    path: /etc/ansible/facts.d/
+    state: directory
+    recurse: yes
+
+- name: Establish default active service fact definition
+  template:
+    src: active_gunicorn_svc.j2
+    dest: /etc/ansible/facts.d/active_gunicorn_svc.fact
+    force: no
+  register: first_time_remote_fact_results
+
+- name: re-read facts after adding custom fact
+  setup:
+    filter: ansible_local
+
+- name: create temporary dir to hold requirements.txt
+  tempfile:
+    state: directory
+    suffix: build
+  register: tmp_dir_results
+  delegate_to: localhost
+  changed_when: false
+  check_mode: no
+  become: no
+
+- set_fact:
+    tmp_dir: "{{ tmp_dir_results.path }}"
+    tmp_dir_git: "{{ tmp_dir_results.path }}/git"
+    django_first_install: "{{ first_time_remote_fact_results|changed }}"
+
+- name: Check if virtualenv already exists
+  stat:
+    path: "{{ current_venv_dir }}"
+  register: venv_check_results
