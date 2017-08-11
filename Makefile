@@ -2,4 +2,4 @@
 
 .PHONY: ci-go
 ci-go:
-	molecule converge -s ci
+	molecule test -s ci
