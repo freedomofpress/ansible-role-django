@@ -1,7 +1,7 @@
 ---
 - name: Get current active django service
   set_fact:
-    django_stack_active_gcorn_svc: "{{ ansible_local.active_gunicorn_svc.django.name }}"
+    django_stack_active_gcorn_svc: "{{ansible_local.active_gunicorn_svc.django.name}}"
   when: ansible_local is defined
 
 - name: Set variable for existing deploy dir checks
@@ -72,7 +72,8 @@
   check_mode: no
   become: no
 
-- set_fact:
+- name: Temporary directory and first-run variables
+  set_fact:
     tmp_dir: "{{ tmp_dir_results.path }}"
     tmp_dir_git: "{{ tmp_dir_results.path }}/git"
     django_first_install: "{{ first_time_remote_fact_results|changed }}"

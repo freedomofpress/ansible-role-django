@@ -12,6 +12,7 @@
   register: orig_git_hash_results
   no_log: true
   ignore_errors: true
+  tags: skip_ansible_lint
 
 - name: Check for pre-existing stats on requirements.txt file
   stat:

@@ -12,7 +12,8 @@
   delegate_to: localhost
   become: no
 
-- add_host:
+- name: Add virtualenv docker to current play inventory
+  add_host:
     name: django_stack_venv
     ansible_connection: docker
 

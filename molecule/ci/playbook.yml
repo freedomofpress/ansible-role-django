@@ -12,7 +12,7 @@
         - /usr/bin/nodejs
       notify: restart paxctld
 
-    - meta:  flush_handlers
+    - meta: flush_handlers
   roles:
     - role: django_stack
       tags: django

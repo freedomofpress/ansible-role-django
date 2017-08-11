@@ -22,15 +22,7 @@
   with_items:
     - src: gunicorn.j2
       dst: /etc/systemd/system/gunicorn-{{ django_stack_active_gcorn_svc }}.service
-  register: systemd_files
-
-- name: Refresh systemd files
-  systemd:
-    daemon_reload: yes
-    name: "gunicorn-{{ django_stack_active_gcorn_svc }}.service"
-    state: started
-    enabled: True
-  when: systemd_files|changed
+  notify: Refresh systemd files
 
 - name: Lay out upstream web server snippet file(s)
   template:

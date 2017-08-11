@@ -33,38 +33,38 @@
   notify: Restart Gunicorn
 
 - block:
-  # Designed to only be one once per install
-  - name: Django optional pre db commands
-    django_manage:
-      command: "{{ item }}"
-      app_path: "{{ active_deploy_dir }}"
-      settings: "{{ django_stack_gcorn_app_settings }}"
-      virtualenv: "{{ django_stack_venv_dir }}"
-    with_items: ["{{ django_stack_manage_pre }}"]
-    ignore_errors: yes
-    when: "django_first_install"
+    # Designed to only be one once per install
+    - name: Django optional pre db commands
+      django_manage:
+        command: "{{ item }}"
+        app_path: "{{ active_deploy_dir }}"
+        settings: "{{ django_stack_gcorn_app_settings }}"
+        virtualenv: "{{ django_stack_venv_dir }}"
+      with_items: ["{{ django_stack_manage_pre }}"]
+      ignore_errors: yes
+      when: "django_first_install"
 
-  - name: Database migrate and other idempotent tasks
-    django_manage:
-      command: "{{ item }}"
-      app_path: "{{ active_deploy_dir }}"
-      settings: "{{ django_stack_gcorn_app_settings }}"
-      virtualenv: "{{ django_stack_venv_dir }}"
-    with_items: "{{ django_stack_db_tasks }}"
-    no_log: "{{ django_stack_manage_no_log }}"
-    register: database_register
-    notify: Restart Gunicorn
+    - name: Database migrate and other idempotent tasks
+      django_manage:
+        command: "{{ item }}"
+        app_path: "{{ active_deploy_dir }}"
+        settings: "{{ django_stack_gcorn_app_settings }}"
+        virtualenv: "{{ django_stack_venv_dir }}"
+      with_items: "{{ django_stack_db_tasks }}"
+      no_log: "{{ django_stack_manage_no_log }}"
+      register: database_register
+      notify: Restart Gunicorn
 
-  # Designed to only be one once per install
-  - name: Django optional post db commands
-    django_manage:
-      command: "{{ item }}"
-      app_path: "{{ active_deploy_dir }}"
-      settings: "{{ django_stack_gcorn_app_settings }}"
-      virtualenv: "{{ django_stack_venv_dir }}"
-    with_items: ["{{ django_stack_manage_post }}"]
-    ignore_errors: "{{ django_stack_manage_post_ignore }}"
-    when: "django_first_install"
+    # Designed to only be one once per install
+    - name: Django optional post db commands
+      django_manage:
+        command: "{{ item }}"
+        app_path: "{{ active_deploy_dir }}"
+        settings: "{{ django_stack_gcorn_app_settings }}"
+        virtualenv: "{{ django_stack_venv_dir }}"
+      with_items: ["{{ django_stack_manage_post }}"]
+      ignore_errors: "{{ django_stack_manage_post_ignore }}"
+      when: "django_first_install"
 
   become_user: "{{ django_stack_gcorn_user }}"
   become: yes
