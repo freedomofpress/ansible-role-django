@@ -10,7 +10,6 @@
         regexp: "^{{ item }}"
       with_items:
         - /usr/bin/nodejs
-        - /home/gcorn/littleweaverweb/bin/pip
       notify: restart paxctld
 
     - meta:  flush_handlers
@@ -25,7 +24,7 @@
     django_stack_app_name: littleweaverweb
     django_secret_key: f1822d2fe58daeadc88e0e4eef2f155fc3edd3713ff9a5d1e27696afd9231d905db51c98dc
     django_stack_es_host_url: disable
-    django_stack_npm_install_cmd: ''
+    django_stack_npm_install_cmd: 'npm install -g postcss-cli autoprefixer'
     django_stack_gcorn_workers: 1
     django_stack_gcorn_threads: 1
     django_stack_gunicorn_opt_envs:
@@ -43,16 +42,17 @@
     django_stack_pkgs:
       - python-dev
     django_stack_git_repo:
-      - url: "https://github.com/littleweaver/littleweaverweb.com.git"
+      - url: "https://github.com/msheiny/littleweaverweb.com.git"
         force: yes
-        branch: e45ce0e27d81279906559afb519983a8f0417d68
+        branch: master
+        #branch: BumpReqs
     django_stack_npm_global_pkgs:
       - autoprefixer
       - postcss-cli
     django_stack_venv_python: python2
     django_stack_override_config: local.py
     # Lets restrict output
-    django_stack_global_no_log: yes
+    django_stack_global_no_log: no
 
   handlers:
     - name: restart paxctld

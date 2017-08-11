@@ -1,2 +1,0 @@
-export CIWWW_IMAGE="quay.io/freedomofpress/ci-webserver"
-export CIWWW_VER="c0539e2bb4dbff922010661d6a8074078c8c9c086b7e59d7b03979cf2879792f"
