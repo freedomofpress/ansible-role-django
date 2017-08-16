@@ -1,0 +1,20 @@
+version: 2
+jobs:
+  build:
+    machine: true
+    working_directory: ~/django_stack
+    steps:
+      - checkout
+
+      - run:
+          name: Install testing pre-reqs
+          command: |
+            virtualenv ~/.venv
+            . ~/.venv/bin/activate
+            pip install -r devops/requirements.txt
+
+      - run:
+          name: Test django-stack playbook
+          command: |
+            . ~/.venv/bin/activate
+            make
