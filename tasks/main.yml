@@ -10,7 +10,6 @@
 - include: npm.yml
   when:
     - current_git_hash != orig_git_hash
-    - django_stack_npm_install_cmd != ""
 
 - include: build-venv.yml
   when:
