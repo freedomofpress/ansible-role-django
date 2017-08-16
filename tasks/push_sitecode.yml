@@ -4,7 +4,7 @@
     src: "{{ tmp_dir }}/git/"
     dest: "{{ active_deploy_dir }}/"
     recursive: yes
-    perms: yes
+    perms: no
     delete: yes
   become_user: "{{ django_stack_gcorn_user }}"
   become: yes
