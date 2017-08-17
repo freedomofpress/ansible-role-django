@@ -1,8 +1,4 @@
 ---
-- name: Establish some npm specific vars for current play
-  set_fact:
-    npm_touch: "touch /status/npm.done"
-
 - name: Optional npm global packages
   npm:
     global: "yes"
@@ -10,5 +6,41 @@
   become: "yes"
   with_items: "{{ django_stack_npm_global_pkgs }}"
 
-- include: npm-code.yml
+# Prepare NodeJS NPM dependencies in a local container, running
+# on the Ansible controller. Since the NPM install command can
+# take a while, we'll wait for a file to be touched after the
+# npm install command exits.
+- block:
+    - name: If grsec, add paxflags cmd to node
+      set_fact:
+        node_grsec_image: "node_grsec"
+      when: ansible_kernel.endswith('grsec')
+
+    - name: Prepare node image with pax flags
+      docker_image:
+        name: "node_grsec:{{ django_stack_node_ver }}"
+        dockerfile: "{{ role_path }}/docker/NodeDockerfile"
+        path: ../../
+        tag: "{{ django_stack_node_ver }}"
+      when: ansible_kernel.endswith('grsec')
+
+    - name: Node local docker builder
+      docker_container:
+        name: pf_tracker_node
+        image: "{{ node_grsec_image|default('node') }}:{{ django_stack_node_ver }}"
+        volumes:
+          - "{{ tmp_dir_git }}:{{ active_deploy_dir }}"
+          - "{{ tmp_dir }}:/status"
+        state: started
+        working_dir: "{{ active_deploy_dir }}"
+        command: /bin/ash -c "{{django_stack_npm_install_cmd}}; touch /status/npm.done"
+        user: node
+        recreate: "yes"
+
+    - name: Wait for node logic to finish up
+      wait_for:
+        path: "{{ tmp_dir }}/npm.done"
+
+  become: "no"
+  delegate_to: localhost
   when: django_stack_npm_install_cmd != ''
