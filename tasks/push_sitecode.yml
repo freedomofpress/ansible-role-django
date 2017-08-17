@@ -8,3 +8,10 @@
     delete: yes
   become_user: "{{ django_stack_gcorn_user }}"
   become: yes
+
+- name: Recursively set permissions
+  file:
+    dest: "{{ active_deploy_dir }}/"
+    owner: "{{ django_stack_gcorn_user }}"
+    group: "{{ django_stack_gcorn_user }}"
+    recurse: yes
