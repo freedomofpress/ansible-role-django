@@ -170,7 +170,7 @@ In order to run a test of the role itself:
 
 If you want to experiment with your own site repo, you'll either have to start
 folding this role into your deployment playbook and experiment there or start
-making local edits to `molecule/cis/playbook.yml` accordingly.
+making local edits to `molecule/ci/playbook.yml` accordingly.
 
 Deployment options
 ------------------
