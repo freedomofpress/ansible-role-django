@@ -24,3 +24,6 @@
 
 - include: gunicorn.yml
   tags: gunicorn
+
+- include: cleanup_local_containers.yml
+  tags: docker

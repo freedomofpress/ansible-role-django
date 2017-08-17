@@ -1,0 +1,11 @@
+---
+- name: Remove local docker containers used for building.
+  docker_container:
+    name: "{{ item }}"
+    state: absent
+    keep_volumes: no
+  delegate_to: localhost
+  become: no
+  with_items:
+    - django_stack_node
+    - django_stack_venv

@@ -26,7 +26,7 @@
 
     - name: Node local docker builder
       docker_container:
-        name: pf_tracker_node
+        name: django_stack_node
         image: "{{ node_grsec_image|default('node') }}:{{ django_stack_node_ver }}"
         volumes:
           - "{{ tmp_dir_git }}:{{ active_deploy_dir }}"
