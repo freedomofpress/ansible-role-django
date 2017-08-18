@@ -1,18 +1,20 @@
 version: 2
 jobs:
   build:
-    working_directory: /root/django_stack
-    docker:
-      - image: msheiny/pressfreedomci:latest
+    machine: true
+    working_directory: ~/django_stack
     steps:
       - checkout
 
-      - setup_remote_docker
+      - run:
+          name: Install testing pre-reqs
+          command: |
+            virtualenv ~/.venv
+            . ~/.venv/bin/activate
+            pip install -r devops/requirements.txt
 
       - run:
-          name: Run django-stack playbook
-          command: make
-
-      - run:
-          name: Ensure site is up and running
-          command: make tests
+          name: Test django-stack playbook
+          command: |
+            . ~/.venv/bin/activate
+            make

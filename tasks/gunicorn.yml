@@ -6,13 +6,13 @@
     owner: "{{ django_stack_gcorn_user }}"
     group: "{{ django_stack_gcorn_group }}"
   with_items:
-    - /run/gunicorn
+    - "/run/gunicorn-{{ django_stack_active_gcorn_svc }}"
     - "/var/log/{{ django_stack_app_name }}"
 
 - name: Define temporary run file
   lineinfile:
-    dest: /etc/tmpfiles.d/gunicorn.conf
-    line: "d /run/gunicorn 0755 {{ django_stack_gcorn_user }} {{ django_stack_gcorn_group }} -"
+    dest: /etc/tmpfiles.d/gunicorn-{{ django_stack_active_gcorn_svc }}.conf
+    line: "d /run/gunicorn-{{django_stack_active_gcorn_svc}} 0755 {{ django_stack_gcorn_user }} {{ django_stack_gcorn_group }} -"
     create: yes
 
 - name: Drop service and socket file
@@ -21,14 +21,12 @@
     dest: "{{ item.dst }}"
   with_items:
     - src: gunicorn.j2
-      dst: /etc/systemd/system/gunicorn.service
-  register: systemd_files
+      dst: /etc/systemd/system/gunicorn-{{ django_stack_active_gcorn_svc }}.service
+  notify: Refresh systemd files
 
-- name: Refresh systemd files
-  systemd:
-    daemon_reload: yes
-    name: "{{ item }}"
-    state: started
-    enabled: True
-  when: systemd_files|changed
-  with_items: ['gunicorn.service']
+- name: Lay out upstream web server snippet file(s)
+  template:
+    dest: "{{ item.path }}"
+    src: "{{ item.template }}"
+  notify: "{{ item.notify }}"
+  with_items: "{{ django_stack_www_snippets }}"

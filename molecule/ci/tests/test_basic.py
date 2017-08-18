@@ -1,9 +1,3 @@
-import testinfra.utils.ansible_runner
-
-testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
-    '.molecule/ansible_inventory').get_hosts('all')
-
-
 def test_mainpage(Command):
     """
     Basic test to make sure home-page is coming up.

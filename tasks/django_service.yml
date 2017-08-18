@@ -1,12 +1,8 @@
 ---
-- set_fact:
-    django_venv_vars: "{{ django_stack_gunicorn_default_envs|combine(django_stack_gunicorn_opt_envs) }}"
 
-- name: Install system dependencies
-  package:
-    name: "{{ item }}"
-  with_items: ["{{ django_stack_pkgs }}"]
-  tags: ['pkgs']
+- name: Combine default virtualenv env variables with user provided ones
+  set_fact:
+    django_venv_vars: "{{ django_stack_gunicorn_default_envs|combine(django_stack_gunicorn_opt_envs) }}"
 
 - name: Global optional python dependencies
   pip:
@@ -14,86 +10,62 @@
     virtualenv_python: "{{ item.python }}"
   with_items: ["{{ django_stack_optional_pip }}"]
 
-- name: Check if virtualenv folder exists
-  stat:
-    path: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
-  register: venv_folder
-
-- name: Create virtualenv and ensure base packages installed
-  pip:
-    name: "{{ item }}"
-    virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
-    virtualenv_python: "{{ django_stack_venv_python }}"
-    virtualenv_site_packages: "{{ django_stack_venv_sitepackage }}"
-    extra_args: "-U"
-  no_log: "{{ django_stack_venv_no_log }}"
-  with_items: "{{ ['pip'] + django_stack_venv_base_pkgs }}"
-  become_user: "{{ django_stack_gcorn_user }}"
-
-- name: Setup virtualenv from requirements file
-  pip:
-    requirements: "{{ django_stack_app_dir }}/requirements.txt"
-    virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
-    virtualenv_python: "{{ django_stack_venv_python }}"
-    virtualenv_site_packages: "{{ django_stack_venv_sitepackage }}"
-    extra_args: "-U --upgrade-strategy only-if-needed"
-  no_log: "{{ django_stack_venv_no_log }}"
-  notify: Restart Gunicorn
-  when: "git_pull_register.changed or not venv_folder.stat.exists or django_stack_force_refresh"
-  become_user: "{{ django_stack_gcorn_user }}"
-
 - name: Ensure environment parameters are sufficiently exported
   lineinfile:
-    dest: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/activate"
+    dest: "{{ django_stack_venv_dir }}/bin/activate"
     line: "set -a"
     create: yes
 
 - name: Ensure environment gets called upon venv activation
   lineinfile:
-    dest: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/activate"
-    line: ". {{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/environment"
+    dest: "{{ django_stack_venv_dir }}/bin/activate"
+    line: ". {{ django_stack_venv_env_file }}"
     insertafter: "^set -a"
 
-- name: Drop credentials in virtualenv environment
+- name: Drop credentials in gcorn home
   template:
-    dest: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}/bin/environment"
+    dest: "{{ django_stack_venv_env_file }}"
+    owner: "{{ django_stack_gcorn_user }}"
+    group: "{{ django_stack_gcorn_group }}"
     src: environment.j2
+    mode: 0770
   no_log: true
   notify: Restart Gunicorn
 
 - block:
-  # Designed to only be one once per install
-  - name: Django optional pre db commands
-    django_manage:
-      command: "{{ item }}"
-      app_path: "{{ django_stack_app_dir }}"
-      settings: "{{ django_stack_gcorn_app_settings }}"
-      virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
-    with_items: ["{{ django_stack_manage_pre }}"]
-    ignore_errors: yes
-    when: not venv_folder.stat.exists
+    # Designed to only be one once per install
+    - name: Django optional pre db commands
+      django_manage:
+        command: "{{ item }}"
+        app_path: "{{ active_deploy_dir }}"
+        settings: "{{ django_stack_gcorn_app_settings }}"
+        virtualenv: "{{ django_stack_venv_dir }}"
+      with_items: ["{{ django_stack_manage_pre }}"]
+      ignore_errors: yes
+      when: "django_first_install"
 
-  - name: Database migrate and other idempotent tasks
-    django_manage:
-      command: "{{ item }}"
-      app_path: "{{ django_stack_app_dir }}"
-      settings: "{{ django_stack_gcorn_app_settings }}"
-      virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
-    with_items: "{{ django_stack_db_tasks }}"
-    no_log: "{{ django_stack_manage_no_log }}"
-    register: database_register
-    notify: Restart Gunicorn
+    - name: Database migrate and other idempotent tasks
+      django_manage:
+        command: "{{ item }}"
+        app_path: "{{ active_deploy_dir }}"
+        settings: "{{ django_stack_gcorn_app_settings }}"
+        virtualenv: "{{ django_stack_venv_dir }}"
+      with_items: "{{ django_stack_db_tasks }}"
+      no_log: "{{ django_stack_manage_no_log }}"
+      register: database_register
+      notify: Restart Gunicorn
 
-  # Designed to only be one once per install
-  - name: Django optional post db commands
-    django_manage:
-      command: "{{ item }}"
-      app_path: "{{ django_stack_app_dir }}"
-      settings: "{{ django_stack_gcorn_app_settings }}"
-      virtualenv: "{{ django_stack_gcorn_home }}/{{ django_stack_app_name }}"
-    with_items: ["{{ django_stack_manage_post }}"]
-    ignore_errors: "{{ django_stack_manage_post_ignore }}"
-    when: not venv_folder.stat.exists
+    # Designed to only be one once per install
+    - name: Django optional post db commands
+      django_manage:
+        command: "{{ item }}"
+        app_path: "{{ active_deploy_dir }}"
+        settings: "{{ django_stack_gcorn_app_settings }}"
+        virtualenv: "{{ django_stack_venv_dir }}"
+      with_items: ["{{ django_stack_manage_post }}"]
+      ignore_errors: "{{ django_stack_manage_post_ignore }}"
+      when: "django_first_install"
 
   become_user: "{{ django_stack_gcorn_user }}"
+  become: yes
   environment: "{{ django_venv_vars }}"

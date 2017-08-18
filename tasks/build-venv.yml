@@ -1,0 +1,67 @@
+---
+- name: Fire-up docker container used for building virtualenv
+  docker_container:
+    name: django_stack_venv
+    image: quay.io/freedomofpress/ci-webserver:latest
+    command: /lib/systemd/systemd
+    capabilities:
+      - SYS_ADMIN
+    volumes:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+      - "{{ tmp_dir }}:/venv-export"
+  delegate_to: localhost
+  become: no
+
+- name: Add virtualenv docker to current play inventory
+  add_host:
+    name: django_stack_venv
+    ansible_connection: docker
+
+- block:
+    - name: Install system dependencies
+      apt:
+        name: "{{ item }}"
+      with_items: ["{{ django_stack_pkgs }}"]
+      tags: ['pkgs']
+
+    # Necessary because there is no way to pass --relocatable to virtualenv from
+    # pip module, so docker build needs to match remote server
+    - name: Create virtualenv base dir to match remote server
+      file:
+        state: directory
+        path: "{{ django_stack_gcorn_home }}"
+        recurse: yes
+
+    - name: Create virtualenv and ensure base packages installed
+      pip:
+        name: "{{ item }}"
+        virtualenv: "{{ django_stack_venv_dir }}"
+        virtualenv_python: "{{ django_stack_venv_python }}"
+        virtualenv_site_packages: "{{ django_stack_venv_sitepackage }}"
+        extra_args: "-U"
+      no_log: "{{ django_stack_venv_no_log }}"
+      with_items: "{{ ['pip'] + django_stack_venv_base_pkgs }}"
+
+    - name: Setup virtualenv from requirements file
+      pip:
+        requirements: "/venv-export/git/requirements.txt"
+        virtualenv: "{{ django_stack_venv_dir }}"
+        virtualenv_python: "{{ django_stack_venv_python }}"
+        virtualenv_site_packages: "{{ django_stack_venv_sitepackage }}"
+      no_log: "{{ django_stack_venv_no_log }}"
+
+    - name: Move remote virtualenv into docker exportable filespace
+      command: mv {{django_stack_venv_dir}} /venv-export/{{django_stack_app_name}}
+
+  delegate_to: django_stack_venv
+  become: no
+
+- name: Copy over locally built virtualenv to remote server
+  synchronize:
+    src: "{{ tmp_dir }}/{{ django_stack_app_name }}/"
+    dest: "{{ django_stack_venv_dir }}/"
+    recursive: yes
+    perms: yes
+    delete: yes
+  become_user: "{{ django_stack_gcorn_user }}"
+  become: yes

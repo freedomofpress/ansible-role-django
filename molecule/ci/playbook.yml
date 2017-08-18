@@ -10,10 +10,9 @@
         regexp: "^{{ item }}"
       with_items:
         - /usr/bin/nodejs
-        - /home/gcorn/littleweaverweb/bin/pip
       notify: restart paxctld
 
-    - meta:  flush_handlers
+    - meta: flush_handlers
   roles:
     - role: django_stack
       tags: django
@@ -43,16 +42,17 @@
     django_stack_pkgs:
       - python-dev
     django_stack_git_repo:
-      - url: "https://github.com/littleweaver/littleweaverweb.com.git"
+      - url: "https://github.com/msheiny/littleweaverweb.com.git"
         force: yes
-        branch: e45ce0e27d81279906559afb519983a8f0417d68
+        branch: master
+        #branch: BumpReqs
     django_stack_npm_global_pkgs:
       - autoprefixer
       - postcss-cli
     django_stack_venv_python: python2
     django_stack_override_config: local.py
     # Lets restrict output
-    django_stack_global_no_log: yes
+    django_stack_global_no_log: no
 
   handlers:
     - name: restart paxctld
