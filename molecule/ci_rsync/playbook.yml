@@ -42,7 +42,7 @@
     django_stack_override_config: local.py
     # Lets restrict output
     django_stack_global_no_log: no
-    django_stack_deploy_src: "{{ lookup('pipe', 'realpath ../../.ci_sync') }}"
+    django_stack_deploy_src: "../../.ci_sync"
 
   handlers:
     - name: restart paxctld

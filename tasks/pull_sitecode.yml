@@ -21,7 +21,7 @@
 
     - name: Conditionally rsync local git repo dir for docker usage
       command: |
-        rsync -a --delete {{ django_stack_rsync_opts | join(" ") }} {{ lookup('pipe', 'realpath '+django_stack_deploy_src) }}/ {{ tmp_dir_git }}/
+        rsync -a --delete {{ django_stack_rsync_opts | join(" ") }} {{ django_stack_deploy_src }}/ {{ tmp_dir_git }}/
       changed_when: false
       no_log: "{{ django_stack_rsync_no_log }}"
       tags: skip_ansible_lint
