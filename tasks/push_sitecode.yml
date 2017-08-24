@@ -6,6 +6,7 @@
     recursive: yes
     perms: no
     delete: yes
+  notify: Update active svc remote fact
   become_user: "{{ django_stack_gcorn_user }}"
   become: yes
 

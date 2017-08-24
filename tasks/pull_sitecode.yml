@@ -70,13 +70,6 @@
     - current_git_hash != orig_git_hash
     - not django_first_install
 
-- name: Update active svc remote fact
-  ini_file:
-    dest: /etc/ansible/facts.d/active_gunicorn_svc.fact
-    section: django
-    option: name
-    value: "{{ django_stack_active_gcorn_svc }}"
-
 - name: Set comparison facts to be used throughout play - II
   set_fact:
     django_stack_venv_dir: "{{django_stack_gcorn_home}}/{{django_stack_app_name}}-{{django_stack_active_gcorn_svc}}"
