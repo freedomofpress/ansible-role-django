@@ -19,5 +19,5 @@ def test_beta(host):
     """
     gcorn_status_file = "/etc/ansible/facts.d/active_gunicorn_svc.fact"
 
-    assert 'alpha' in host.file(gcorn_status_file).content_string
-    assert '8000' in host.file('/etc/nginx/snippets/proxy.conf').content_string
+    assert 'beta' in host.file(gcorn_status_file).content_string
+    assert '8001' in host.file('/etc/nginx/snippets/proxy.conf').content_string

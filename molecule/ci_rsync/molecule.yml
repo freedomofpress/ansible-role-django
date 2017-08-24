@@ -22,10 +22,8 @@ provisioner:
   lint:
     name: ansible-lint
 scenario:
-  name: ci
+  name: ci_rsync
   test_sequence:
-    - destroy
-    - create
     - converge
     - idempotence
     - lint
