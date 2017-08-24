@@ -8,6 +8,7 @@
         repo: https://github.com/msheiny/littleweaverweb.com.git
         dest: "{{ django_stack_deploy_src }}"
         version: BumpReqs
+      changed_when: false
       delegate_to: localhost
   roles:
     - role: django_stack
