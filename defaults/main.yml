@@ -114,8 +114,7 @@ django_stack_gunicorn_opt_envs: {}
 # of code via git
 django_stack_force_refresh: false
 
-django_stack_rsync_opts:
-  - "--exclude=.git"
+django_stack_rsync_opts: []
 
 django_stack_www_snippets:
   - path: /etc/nginx/snippets/proxy.conf
