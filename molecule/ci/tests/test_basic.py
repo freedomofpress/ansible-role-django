@@ -13,9 +13,9 @@ def test_mainpage(host):
     assert "HTTP/1.1 200 OK" in head
 
 
-def test_beta(host):
+def test_gunicorn_svc_status(host):
     """
-    Check that django service has switched to 'beta'
+    Check that django service is set to alpha
     """
     gcorn_status_file = "/etc/ansible/facts.d/active_gunicorn_svc.fact"
 

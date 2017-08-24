@@ -5,6 +5,7 @@
     state: absent
     keep_volumes: no
   delegate_to: localhost
+  changed_when: false
   become: no
   with_items:
     - django_stack_node

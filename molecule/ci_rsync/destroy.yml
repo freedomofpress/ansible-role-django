@@ -14,9 +14,3 @@
         state: absent
         force_kill: "{{ item.force_kill | default(True) }}"
       with_items: "{{ molecule_yml.platforms }}"
-
-    - name: Destroy virtual_env docker
-      docker_container:
-        name: django_stack_venv
-        state: absent
-        force_kill: True

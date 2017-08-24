@@ -37,15 +37,12 @@
       DJANGO_STATIC_ROOT: /var/www/django-static
       DJANGO_MEDIA_ROOT: /var/www/django-media
     django_stack_gcorn_app_settings: littleweaverweb.settings.local
-    #django_stack_force_refresh: true
-    # The default packages are preinstalled on the base dockerimage
     django_stack_pkgs:
       - python-dev
     django_stack_git_repo:
       - url: "https://github.com/msheiny/littleweaverweb.com.git"
         force: yes
         branch: master
-        #branch: BumpReqs
     django_stack_npm_global_pkgs:
       - autoprefixer
       - postcss-cli

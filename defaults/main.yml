@@ -48,11 +48,11 @@ django_db_password: django_password
 django_db_host: localhost
 django_db_port: 5432
 
-#elasticsearch
+# elasticsearch
 django_stack_es_host_url: http://localhost:9200
 django_stack_es_ca_path: /etc/ssl/certs/testca_freedom_press.pem
 
-#npm settings
+# npm settings
 django_stack_npm_install_cmd: "npm install; npm run start"
 django_stack_npm_dir: "{{ django_stack_app_dir }}"
 django_stack_npm_no_log: "{{ django_stack_global_no_log }}"
