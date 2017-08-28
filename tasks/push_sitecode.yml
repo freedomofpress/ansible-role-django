@@ -6,6 +6,7 @@
     recursive: yes
     perms: no
     delete: yes
+  notify: update gunicorn service facts
   become_user: "{{ django_stack_gcorn_user }}"
   become: yes
 

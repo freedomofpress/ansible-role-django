@@ -20,13 +20,11 @@
         - django_stack_deploy_src == ''
 
     - name: Conditionally rsync local git repo dir for docker usage
-      synchronize:
-        dest: "{{ tmp_dir_git }}/"
-        src: "{{ django_stack_deploy_src }}"
-        delete: yes
-        rsync_opts: "{{ django_stack_rsync_opts }}"
+      command: |
+        rsync -a --delete {{ django_stack_rsync_opts | join(" ") }} {{ django_stack_deploy_src }}/ {{ tmp_dir_git }}/
       changed_when: false
       no_log: "{{ django_stack_rsync_no_log }}"
+      tags: skip_ansible_lint
       when:
         - not django_stack_git_repo
         - "not django_stack_deploy_src == ''"
@@ -71,13 +69,6 @@
     - "item.key != ansible_local.active_gunicorn_svc.django.name"
     - current_git_hash != orig_git_hash
     - not django_first_install
-
-- name: Update active svc remote fact
-  ini_file:
-    dest: /etc/ansible/facts.d/active_gunicorn_svc.fact
-    section: django
-    option: name
-    value: "{{ django_stack_active_gcorn_svc }}"
 
 - name: Set comparison facts to be used throughout play - II
   set_fact:

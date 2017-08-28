@@ -3,16 +3,13 @@
 - name: Run django environment
   hosts: django
   pre_tasks:
-    - name: Add pax flags
-      lineinfile:
-        dest: "/etc/paxctld.conf"
-        line: "{{ item }}  m"
-        regexp: "^{{ item }}"
-      with_items:
-        - /usr/bin/nodejs
-      notify: restart paxctld
-
-    - meta: flush_handlers
+    - name: Pull down code in prep for rsync test
+      git:
+        repo: https://github.com/msheiny/littleweaverweb.com.git
+        dest: "{{ django_stack_deploy_src }}"
+        version: BumpReqs
+      changed_when: false
+      delegate_to: localhost
   roles:
     - role: django_stack
       tags: django
@@ -39,10 +36,6 @@
     django_stack_gcorn_app_settings: littleweaverweb.settings.local
     django_stack_pkgs:
       - python-dev
-    django_stack_git_repo:
-      - url: "https://github.com/msheiny/littleweaverweb.com.git"
-        force: yes
-        branch: master
     django_stack_npm_global_pkgs:
       - autoprefixer
       - postcss-cli
@@ -50,6 +43,7 @@
     django_stack_override_config: local.py
     # Lets restrict output
     django_stack_global_no_log: no
+    django_stack_deploy_src: "../../.ci_sync"
 
   handlers:
     - name: restart paxctld

@@ -16,3 +16,13 @@
     name: "gunicorn-{{ django_stack_active_gcorn_svc }}.service"
     state: started
     enabled: True
+
+- name: update gunicorn service facts
+  ini_file:
+    dest: /etc/ansible/facts.d/active_gunicorn_svc.fact
+    section: django
+    option: name
+    value: "{{ django_stack_active_gcorn_svc }}"
+    owner: root
+    group: root
+    mode: "0644"

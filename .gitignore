@@ -3,6 +3,7 @@
 .molecule/
 .vagrant/
 app-src/
+.ci_sync
 
 # Created by https://www.gitignore.io/api/python
 

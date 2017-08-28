@@ -34,7 +34,7 @@
         state: started
         working_dir: "{{ active_deploy_dir }}"
         command: /bin/ash -c "{{django_stack_npm_install_cmd}}; touch /status/npm.done"
-        user: node
+        user: "{{ 'node' if (lookup('pipe','id -u') == '1000') else omit }}"
         recreate: "yes"
 
     - name: Wait for node logic to finish up
