@@ -21,6 +21,7 @@
     - name: Install system dependencies
       apt:
         name: "{{ item }}"
+        update_cache: yes
       with_items: ["{{ django_stack_pkgs }}"]
       tags: ['pkgs']
 
