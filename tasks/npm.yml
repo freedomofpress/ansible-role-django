@@ -33,13 +33,11 @@
           - "{{ tmp_dir }}:/status"
         state: started
         working_dir: "{{ active_deploy_dir }}"
-        command: /bin/ash -c "{{django_stack_npm_install_cmd}}; touch /status/npm.done"
+        command: /bin/ash -c "{{ django_stack_npm_install_cmd }}"
         user: "{{ 'node' if (lookup('pipe','id -u') == '1000') else omit }}"
+        # Block until command is finished; report failure on error
+        detach: no
         recreate: "yes"
-
-    - name: Wait for node logic to finish up
-      wait_for:
-        path: "{{ tmp_dir }}/npm.done"
 
   become: "no"
   delegate_to: localhost
