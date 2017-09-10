@@ -22,6 +22,7 @@
         dockerfile: "{{ django_stack_node_dockerfile }}"
         path: ../../
         tag: "{{ django_stack_node_ver }}"
+        force: yes
       when: ansible_kernel.endswith('grsec')
 
     - name: Node local docker builder
@@ -38,6 +39,7 @@
         # Block until command is finished; report failure on error
         detach: no
         recreate: "yes"
+        keep_volumes: no
 
   become: "no"
   delegate_to: localhost
