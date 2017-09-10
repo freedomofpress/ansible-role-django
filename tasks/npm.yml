@@ -19,7 +19,7 @@
     - name: Prepare node image with pax flags
       docker_image:
         name: "node_grsec:{{ django_stack_node_ver }}"
-        dockerfile: "{{ role_path }}/docker/NodeDockerfile"
+        dockerfile: "{{ django_stack_node_dockerfile }}"
         path: ../../
         tag: "{{ django_stack_node_ver }}"
       when: ansible_kernel.endswith('grsec')
