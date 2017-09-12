@@ -61,6 +61,9 @@ django_stack_shell_commands: []
 # This is the tag for the node image used locally to prepare the code
 django_stack_node_ver: 6.11.0-alpine
 
+# Default to a slim node Dockerfile shipped with role, but permit overrides.
+django_stack_node_dockerfile: "{{ role_path }}/docker/NodeDockerfile"
+
 django_stack_pkgs:
   - gcc
   - g++

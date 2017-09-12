@@ -18,11 +18,11 @@
 
     - name: Prepare node image with pax flags
       docker_image:
-        name: "node_grsec:{{ django_stack_node_ver }}"
-        dockerfile: "{{ role_path }}/docker/NodeDockerfile"
+        name: "{{ nocde_grsec_image|default('node') }}:{{ django_stack_node_ver }}"
+        dockerfile: "{{ django_stack_node_dockerfile }}"
         path: ../../
         tag: "{{ django_stack_node_ver }}"
-      when: ansible_kernel.endswith('grsec')
+        force: yes
 
     - name: Node local docker builder
       docker_container:
@@ -33,13 +33,12 @@
           - "{{ tmp_dir }}:/status"
         state: started
         working_dir: "{{ active_deploy_dir }}"
-        command: /bin/ash -c "{{django_stack_npm_install_cmd}}; touch /status/npm.done"
+        command: /bin/ash -c "{{ django_stack_npm_install_cmd }}"
         user: "{{ 'node' if (lookup('pipe','id -u') == '1000') else omit }}"
+        # Block until command is finished; report failure on error
+        detach: no
         recreate: "yes"
-
-    - name: Wait for node logic to finish up
-      wait_for:
-        path: "{{ tmp_dir }}/npm.done"
+        keep_volumes: no
 
   become: "no"
   delegate_to: localhost
