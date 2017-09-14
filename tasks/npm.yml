@@ -18,9 +18,9 @@
 
     - name: Prepare node image with pax flags
       docker_image:
-        name: "{{ nocde_grsec_image|default('node') }}:{{ django_stack_node_ver }}"
+        name: "{{ node_grsec_image|default('node') }}:{{ django_stack_node_ver }}"
         dockerfile: "{{ django_stack_node_dockerfile }}"
-        path: ../../
+        path: "{{ django_stack_node_dockercontext }}"
         tag: "{{ django_stack_node_ver }}"
         force: yes
 
