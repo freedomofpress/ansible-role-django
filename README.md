@@ -83,11 +83,11 @@ django_db_password: django_password
 django_db_host: localhost
 django_db_port: 5432
 
-#elasticsearch
+# elasticsearch
 django_stack_es_host_url: http://localhost:9200
 django_stack_es_ca_path: /etc/ssl/certs/testca_freedom_press.pem
 
-#npm settings
+# npm settings
 django_stack_npm_install_cmd: "npm install; npm run start"
 django_stack_npm_dir: "{{ django_stack_app_dir }}"
 django_stack_npm_no_log: "{{ django_stack_global_no_log }}"
@@ -95,6 +95,10 @@ django_stack_npm_global_pkgs: []
 django_stack_shell_commands: []
 # This is the tag for the node image used locally to prepare the code
 django_stack_node_ver: 6.11.0-alpine
+
+# Default to a slim node Dockerfile shipped with role, but permit overrides.
+django_stack_node_dockerfile: "{{ role_path }}/docker/NodeDockerfile"
+django_stack_node_dockercontext: "{{ role_path }}/docker"
 
 django_stack_pkgs:
   - gcc
@@ -149,8 +153,7 @@ django_stack_gunicorn_opt_envs: {}
 # of code via git
 django_stack_force_refresh: false
 
-django_stack_rsync_opts:
-  - "--exclude=.git"
+django_stack_rsync_opts: []
 
 django_stack_www_snippets:
   - path: /etc/nginx/snippets/proxy.conf
