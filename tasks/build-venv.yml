@@ -9,6 +9,7 @@
     volumes:
       - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
       - "{{ tmp_dir }}:/venv-export"
+    env: "{{ django_stack_venv_env | default(omit) }}"
   delegate_to: localhost
   become: no
 

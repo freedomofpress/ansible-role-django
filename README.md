@@ -76,6 +76,8 @@ django_stack_venv_base_pkgs: []
 django_stack_optional_pip: []
 # - name: django
 #   python: python2
+# Optional dictionary to pass to virtualenv docker builder
+django_stack_venv_env: {}
 
 # database settings
 django_db_user: django_user
