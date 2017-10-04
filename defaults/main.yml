@@ -38,6 +38,8 @@ django_stack_venv_python: python3
 django_stack_venv_sitepackage: no
 django_stack_venv_no_log: "{{ django_stack_global_no_log }}"
 django_stack_venv_base_pkgs: []
+django_stack_venv_docker_volumes: []
+django_stack_venv_docker_image: "quay.io/freedomofpress/ci-webserver:latest"
 django_stack_optional_pip: []
 # - name: django
 #   python: python2

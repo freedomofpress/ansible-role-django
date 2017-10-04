@@ -2,13 +2,10 @@
 - name: Fire-up docker container used for building virtualenv
   docker_container:
     name: django_stack_venv
-    image: quay.io/freedomofpress/ci-webserver:latest
-    command: /lib/systemd/systemd
-    capabilities:
-      - SYS_ADMIN
-    volumes:
-      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
-      - "{{ tmp_dir }}:/venv-export"
+    image: "{{ django_stack_venv_docker_image }}"
+    command: "{{ django_stack_venv_docker_cmd|default(omit) }}"
+    capabilities: "{{ django_stack_venv_docker_cap|default(omit) }}"
+    volumes: "{{ django_stack_venv_docker_volumes + [tmp_dir+':/venv-export'] }}"
     env: "{{ django_stack_venv_env | default(omit) }}"
   delegate_to: localhost
   become: no
@@ -44,6 +41,10 @@
         extra_args: "-U"
       no_log: "{{ django_stack_venv_no_log }}"
       with_items: "{{ ['pip'] + django_stack_venv_base_pkgs }}"
+
+    - name: Optional commands to run prior to req install
+      command: "{{ item }}"
+      with_items: "{{ django_stack_venv_cmds }}"
 
     - name: Setup virtualenv from requirements file
       pip:
