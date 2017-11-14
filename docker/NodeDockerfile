@@ -1,3 +1,13 @@
 FROM node:6.11.0-alpine
 
 RUN apk add paxctl --no-cache; paxctl -cm /usr/local/bin/node
+
+USER node
+
+# See:
+#   - https://docs.npmjs.com/misc/config
+#   - https://docs.npmjs.com/cli/npm
+# for more config settings/implementation
+
+ENV npm_config_progress=false
+ENV npm_config_loglevel=warn
