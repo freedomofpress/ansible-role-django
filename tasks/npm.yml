@@ -11,10 +11,15 @@
 # take a while, we'll wait for a file to be touched after the
 # npm install command exits.
 - block:
+    - name: Check for existence of grsec kernel
+      stat:
+        path: /proc/sys/kernel/grsecurity/
+      register: check_grsec_kernel_results
+
     - name: If grsec, add paxflags cmd to node
       set_fact:
         node_grsec_image: "node_grsec"
-      when: ansible_kernel.endswith('grsec')
+      when: check_grsec_kernel_results.stat.exists
 
     - name: Prepare node image with pax flags
       docker_image:
