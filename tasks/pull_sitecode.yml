@@ -72,5 +72,5 @@
 
 - name: Set comparison facts to be used throughout play - II
   set_fact:
-    django_stack_venv_dir: "{{django_stack_gcorn_home}}/{{django_stack_app_name}}-{{django_stack_active_gcorn_svc}}"
+    django_stack_venv_dir: "{{ django_stack_gcorn_home }}/django-{{ django_stack_active_gcorn_svc }}"
     active_deploy_dir: "{{ django_stack_deploy_dir }}-{{ django_stack_active_gcorn_svc }}"
