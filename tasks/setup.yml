@@ -7,7 +7,7 @@
 - name: Set variable for existing deploy dir checks
   set_fact:
     existing_django_deploy_dir: "{{django_stack_deploy_dir}}-{{django_stack_active_gcorn_svc}}"
-    current_venv_dir: "{{django_stack_gcorn_home}}/{{django_stack_app_name}}-{{django_stack_active_gcorn_svc}}"
+    current_venv_dir: "{{ django_stack_gcorn_home }}/django-{{ django_stack_active_gcorn_svc }}"
 
 - name: Configure gunicorn user
   user:
