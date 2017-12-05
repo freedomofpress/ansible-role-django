@@ -2,7 +2,7 @@
 - name: Get current active django service
   set_fact:
     django_stack_active_gcorn_svc: "{{ansible_local.active_gunicorn_svc.django.name}}"
-  when: ansible_local is defined
+  when: ansible_local|default({}) != {}
 
 - name: Set variable for existing deploy dir checks
   set_fact:
