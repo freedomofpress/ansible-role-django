@@ -33,7 +33,6 @@ Role Variables
 --------------
 
 ```yaml
----
 # defaults file for fpf-django-stack
 django_stack_app_name: fpf
 django_stack_deploy_dir: /var/www/django
@@ -73,6 +72,9 @@ django_stack_venv_python: python3
 django_stack_venv_sitepackage: no
 django_stack_venv_no_log: "{{ django_stack_global_no_log }}"
 django_stack_venv_base_pkgs: []
+django_stack_venv_cmds: []
+django_stack_venv_docker_volumes: []
+django_stack_venv_docker_image: "quay.io/freedomofpress/ci-webserver:latest"
 django_stack_optional_pip: []
 # - name: django
 #   python: python2
@@ -161,6 +163,23 @@ django_stack_www_snippets:
   - path: /etc/nginx/snippets/proxy.conf
     template: nginx-snippet.j2
     notify: reload nginx
+
+# Over-ride this boolean to enable celery worker system service
+django_stack_celery_worker: false
+django_stack_celery_nodes: "w1"
+django_stack_celery_user: "{{ django_stack_gcorn_user }}"
+django_stack_celery_group: "{{ django_stack_gcorn_group }}"
+django_stack_celery_svc_name: "celery-www"
+django_stack_celery_svc_conf:
+  pid_file: "/var/run/celery/%n.pid"
+  log_file: "/var/log/celery/%n%I.log"
+  log_level: INFO
+  opts: "--time-limit=300 --concurrency=8"
+  nodes: "{{ django_stack_celery_nodes }}"
+  user: "{{ django_stack_celery_user }}"
+  group: "{{ django_stack_celery_group }}"
+django_stack_celery_sysd:
+  after: network.target
 ```
 
 
