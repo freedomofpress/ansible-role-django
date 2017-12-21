@@ -27,13 +27,26 @@
     - "{{ django_stack_media_root }}"
     - "{{ django_stack_logdir }}"
 
-- name: Establish code directories
+- name: Establish django service static directories
   file:
-    path: "{{ django_stack_deploy_dir }}-{{ item }}"
+    path: "{{ item }}"
     state: directory
     owner: "{{ django_stack_gcorn_user }}"
     group: "{{ django_stack_gcorn_group }}"
-  with_items: "{{ django_stack_gcorn_ports.keys() }}"
+  with_items:
+    - "/var/log/{{ django_stack_app_name }}"
+    - "/var/log/celery"
+    - "/var/run/celery"
+
+- name: Establish django service dynamic directories
+  file:
+    path: "{{ item[0] }}-{{ item[1] }}"
+    state: directory
+    owner: "{{ django_stack_gcorn_user }}"
+    group: "{{ django_stack_gcorn_group }}"
+  with_nested:
+    - ["{{django_stack_deploy_dir}}", "/run/gunicorn"]
+    - "{{ django_stack_gcorn_ports.keys() }}"
   register: check_first_time_results
 
 - name: Touch log file
@@ -82,3 +95,21 @@
   stat:
     path: "{{ current_venv_dir }}"
   register: venv_check_results
+
+- name: Define dynamic run tmpfile(s)
+  lineinfile:
+    dest: /etc/tmpfiles.d/{{ item[0] }}-{{ item[1] }}.conf
+    line: "d /run/{{item[0]}}-{{item[1]}} 0755 {{django_stack_gcorn_user}} {{django_stack_gcorn_group}} -"
+    create: yes
+  with_nested:
+    - ['gunicorn']
+    - "{{ django_stack_gcorn_ports.keys() }}"
+
+- name: Define static run tmpfile(s)
+  lineinfile:
+    dest: /etc/tmpfiles.d/{{ item[0] }}
+    line: "d {{item[1]}}/{{item[0]}} 0755 {{django_stack_gcorn_user}} {{django_stack_gcorn_group}} -"
+    create: yes
+  with_nested:
+    - ['celery']
+    - ['/run/', '/var/log']
