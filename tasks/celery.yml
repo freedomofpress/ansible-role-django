@@ -1,0 +1,24 @@
+---
+- name: Drop celery config file
+  copy:
+    content: |
+      {% for key in django_stack_celery_svc_conf.keys() %}
+      CELERYD_{{key|upper}}="{{django_stack_celery_svc_conf[key]}}"
+      {% endfor %}
+      CELERYD_CHDIR="{{ active_deploy_dir }}"
+      CELERY_BIN="{{ django_stack_venv_dir }}/bin/celery"
+      CELERY_APP="{{ django_stack_app_name }}"
+    dest: /etc/default/celeryd
+
+- name: Stop existing celery runner
+  service:
+    name: "{{ django_stack_celery_svc_name }}"
+    state: stopped
+  # The celery runner might not exist yet, lets not fail in that scenario
+  ignore_errors: true
+
+- name: Lay out systemd template
+  template:
+    src: celery.j2
+    dest: "/etc/systemd/system/{{ django_stack_celery_svc_name }}.service"
+  notify: Start celery worker

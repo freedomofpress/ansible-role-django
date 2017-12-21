@@ -19,6 +19,9 @@
   when:
     - current_git_hash != orig_git_hash
 
+- include: celery.yml
+  when: django_stack_celery_worker
+
 - include: django_service.yml
   tags: django
 
