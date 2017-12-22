@@ -26,14 +26,6 @@
     - "{{ django_stack_static_root }}"
     - "{{ django_stack_media_root }}"
     - "{{ django_stack_logdir }}"
-
-- name: Establish django service static directories
-  file:
-    path: "{{ item }}"
-    state: directory
-    owner: "{{ django_stack_gcorn_user }}"
-    group: "{{ django_stack_gcorn_group }}"
-  with_items:
     - "/var/log/{{ django_stack_app_name }}"
     - "/var/log/celery"
     - "/var/run/celery"
@@ -105,11 +97,11 @@
     - ['gunicorn']
     - "{{ django_stack_gcorn_ports.keys() }}"
 
-- name: Define static run tmpfile(s)
+- name: Define celery run tmpfile(s)
   lineinfile:
-    dest: /etc/tmpfiles.d/{{ item[0] }}
-    line: "d {{item[1]}}/{{item[0]}} 0755 {{django_stack_gcorn_user}} {{django_stack_gcorn_group}} -"
+    dest: /etc/tmpfiles.d/celery
+    line: "d {{item}}/celery 0755 {{django_stack_gcorn_user}} {{django_stack_gcorn_group}} -"
     create: yes
-  with_nested:
-    - ['celery']
-    - ['/run/', '/var/log']
+  with_items:
+    - /run/
+    - /var/log

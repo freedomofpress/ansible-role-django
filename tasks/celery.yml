@@ -24,7 +24,7 @@
     src: celery.j2
     dest: "{{ celery_sysd_path }}"
   register: celery_sysd_unit_result
-  notify: Start celery worker
+  notify: Restart celery worker
 
 # We should stop the service before the reload and restart handler b/c
 # after the template change the exec lines are completely different and point
