@@ -1,4 +1,8 @@
 ---
+- name: Establish celery task facts
+  set_fact:
+    celery_sysd_path: "/etc/systemd/system/{{ django_stack_celery_svc_name }}.service"
+
 - name: Drop celery config file
   copy:
     content: |
@@ -10,15 +14,26 @@
       CELERY_APP="{{ django_stack_app_name }}"
     dest: /etc/default/celeryd
 
-- name: Stop existing celery runner
-  service:
-    name: "{{ django_stack_celery_svc_name }}"
-    state: stopped
-  # The celery runner might not exist yet, lets not fail in that scenario
-  ignore_errors: true
+- name: Determine if unit file already exists
+  stat:
+    path: "{{ celery_sysd_path }}"
+  register: celery_sysd_path_result
 
 - name: Lay out systemd template
   template:
     src: celery.j2
-    dest: "/etc/systemd/system/{{ django_stack_celery_svc_name }}.service"
+    dest: "{{ celery_sysd_path }}"
+  register: celery_sysd_unit_result
   notify: Start celery worker
+
+# We should stop the service before the reload and restart handler b/c
+# after the template change the exec lines are completely different and point
+# to different virtualenvs. As long as we stop before systemd daemon is
+# reloaded, stopping now reflects the old unit file configuration.
+- name: Immediately stop existing celery runner on changes
+  service:
+    name: "{{ django_stack_celery_svc_name }}"
+    state: stopped
+  when:
+    - celery_sysd_unit_result|changed
+    - celery_sysd_path_result.stat.exists
