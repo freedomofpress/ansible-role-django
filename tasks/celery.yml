@@ -37,3 +37,5 @@
   when:
     - celery_sysd_unit_result|changed
     - celery_sysd_path_result.stat.exists
+  tags:
+    - skip_ansible_lint
