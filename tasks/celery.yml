@@ -13,6 +13,8 @@
       CELERY_BIN="{{ django_stack_venv_dir }}/bin/celery"
       CELERY_APP="{{ django_stack_app_name }}"
     dest: /etc/default/celeryd
+  register: celery_config_file_result
+  notify: Restart celery worker
 
 - name: Determine if unit file already exists
   stat:
@@ -34,8 +36,8 @@
   service:
     name: "{{ django_stack_celery_svc_name }}"
     state: stopped
-  when:
-    - celery_sysd_unit_result|changed
-    - celery_sysd_path_result.stat.exists
+  when: (celery_sysd_unit_result|changed and
+         celery_sysd_path_result.stat.exists) or
+        celery_config_file_result|changed
   tags:
     - skip_ansible_lint
