@@ -1,0 +1,43 @@
+---
+- name: Establish celery task facts
+  set_fact:
+    celery_sysd_path: "/etc/systemd/system/{{ django_stack_celery_svc_name }}.service"
+
+- name: Drop celery config file
+  copy:
+    content: |
+      {% for key in django_stack_celery_svc_conf.keys() %}
+      CELERYD_{{key|upper}}="{{django_stack_celery_svc_conf[key]}}"
+      {% endfor %}
+      CELERYD_CHDIR="{{ active_deploy_dir }}"
+      CELERY_BIN="{{ django_stack_venv_dir }}/bin/celery"
+      CELERY_APP="{{ django_stack_app_name }}"
+    dest: /etc/default/celeryd
+  register: celery_config_file_result
+  notify: Restart celery worker
+
+- name: Determine if unit file already exists
+  stat:
+    path: "{{ celery_sysd_path }}"
+  register: celery_sysd_path_result
+
+- name: Lay out systemd template
+  template:
+    src: celery.j2
+    dest: "{{ celery_sysd_path }}"
+  register: celery_sysd_unit_result
+  notify: Restart celery worker
+
+# We should stop the service before the reload and restart handler b/c
+# after the template change the exec lines are completely different and point
+# to different virtualenvs. As long as we stop before systemd daemon is
+# reloaded, stopping now reflects the old unit file configuration.
+- name: Immediately stop existing celery runner on changes
+  service:
+    name: "{{ django_stack_celery_svc_name }}"
+    state: stopped
+  when: (celery_sysd_unit_result|changed and
+         celery_sysd_path_result.stat.exists) or
+        celery_config_file_result|changed
+  tags:
+    - skip_ansible_lint

@@ -17,6 +17,13 @@
     state: started
     enabled: True
 
+- name: Restart celery worker
+  systemd:
+    daemon_reload: yes
+    name: "{{ django_stack_celery_svc_name }}.service"
+    state: restarted
+    enabled: True
+
 - name: update gunicorn service facts
   ini_file:
     dest: /etc/ansible/facts.d/active_gunicorn_svc.fact

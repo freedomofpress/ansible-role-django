@@ -1,20 +1,4 @@
 ---
-- name: Ensure run directory exists for gunicorn
-  file:
-    path: "{{ item }}"
-    state: directory
-    owner: "{{ django_stack_gcorn_user }}"
-    group: "{{ django_stack_gcorn_group }}"
-  with_items:
-    - "/run/gunicorn-{{ django_stack_active_gcorn_svc }}"
-    - "/var/log/{{ django_stack_app_name }}"
-
-- name: Define temporary run file
-  lineinfile:
-    dest: /etc/tmpfiles.d/gunicorn-{{ django_stack_active_gcorn_svc }}.conf
-    line: "d /run/gunicorn-{{django_stack_active_gcorn_svc}} 0755 {{ django_stack_gcorn_user }} {{ django_stack_gcorn_group }} -"
-    create: yes
-
 - name: Drop service and socket file
   template:
     src: "{{ item.src }}"
