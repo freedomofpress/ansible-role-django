@@ -28,6 +28,9 @@ django_stack_gcorn_workers: 8
 django_stack_gcorn_threads: 4
 django_stack_gcorn_loglevel: info
 
+# Relative path to requirements file from root of repository
+django_stack_requirements_path: requirements.txt
+
 # If you want to try to keep output to a minimum, toggle this on.
 # For example, in CI verbose built output can obscure relevant test info.
 django_stack_global_no_log: no
