@@ -46,7 +46,7 @@
 
     - name: Check hash of current requirements.txt file
       stat:
-        path: "{{ tmp_dir_git }}/requirements.txt"
+        path: "{{ tmp_dir_git }}/{{ django_stack_requirements_path }}"
         checksum_algorithm: sha256
         get_md5: false
       register: current_req_file_results

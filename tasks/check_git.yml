@@ -16,7 +16,7 @@
 
 - name: Check for pre-existing stats on requirements.txt file
   stat:
-    path: "{{ existing_django_deploy_dir }}/requirements.txt"
+    path: "{{ existing_django_deploy_dir }}/{{ django_stack_requirements_path }}"
     checksum_algorithm: sha256
     get_md5: false
   register: orig_req_file_results

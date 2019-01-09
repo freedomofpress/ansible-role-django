@@ -48,7 +48,7 @@
 
     - name: Setup virtualenv from requirements file
       pip:
-        requirements: "/venv-export/git/requirements.txt"
+        requirements: "/venv-export/git/{{ django_stack_requirements_path }}"
         virtualenv: "{{ django_stack_venv_dir }}"
         virtualenv_python: "{{ django_stack_venv_python }}"
         virtualenv_site_packages: "{{ django_stack_venv_sitepackage }}"
