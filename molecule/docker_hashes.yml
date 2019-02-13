@@ -1,4 +1,0 @@
----
-quay.io/freedomofpress/ci-webserver:
-  tag: "v2"
-  hash: "sha256:01043918ae2a3a663bb6493c8d879892456bc34875ea21f6fc6cb693614afef6"

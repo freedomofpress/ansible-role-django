@@ -7,8 +7,7 @@ I'd like to take advantage of many third-party and internal roles for handling
 things like postgres, nginx, etc.
 
 This role is not tied to a specific django repo and its designed to be flexible,
-a lot of the flexibility plays out via ansible variables. For local testing
-purposes, this repo is being tested against [littleweaverweb.com's repository](https://github.com/littleweaver/littleweaverweb.com).
+a lot of the flexibility plays out via ansible variables.
 
 In order to fully take advantage of the role as currently laid out you'll need
 to use nginx and `include snippets/proxy.conf` at any point in your configs
@@ -25,22 +24,7 @@ Requirements
 
 These are the following system requirements:
 
-* python2.7+
-* virtualenv
 * docker
-
-Getting started for local deployment
-------------------------------------
-
-In order to run a test of the role itself:
-
-* Install pip requirements in `devops/requirements.txt` (recommend using a
-  virtualenv)
-* Run `make ci-go`
-
-If you want to experiment with your own site repo, you'll either have to start
-folding this role into your deployment playbook and experiment there or start
-making local edits to `molecule/ci/playbook.yml` accordingly.
 
 Deployment options
 ------------------
