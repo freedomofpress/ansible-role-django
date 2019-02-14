@@ -1,4 +1,5 @@
-FROM node:6.11.0-alpine
+ARG NODE_VER
+FROM node:${NODE_VER}
 
 RUN apk add paxctl --no-cache; paxctl -cm /usr/local/bin/node
 
