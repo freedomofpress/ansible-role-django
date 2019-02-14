@@ -33,6 +33,7 @@
       docker_container:
         name: django_stack_node
         image: "{{ node_grsec_image|default('node') }}:{{ django_stack_node_ver }}"
+        buildargs: "{{ django_stack_node_buildargs }}"
         volumes:
           - "{{ tmp_dir_git }}:{{ active_deploy_dir }}"
           - "{{ tmp_dir }}:/status"
