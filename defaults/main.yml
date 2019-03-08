@@ -67,7 +67,7 @@ django_stack_npm_no_log: "{{ django_stack_global_no_log }}"
 django_stack_npm_global_pkgs: []
 django_stack_shell_commands: []
 # This is the tag for the node image used locally to prepare the code
-django_stack_node_ver: 6.11.0-alpine
+django_stack_node_ver: 10.15.1-alpine
 
 # Default to a slim node Dockerfile shipped with role, but permit overrides.
 django_stack_node_dockerfile: "{{ role_path }}/docker/NodeDockerfile"
