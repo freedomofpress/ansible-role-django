@@ -25,6 +25,7 @@
       docker_image:
         name: "{{ node_grsec_image|default('node') }}:{{ django_stack_node_ver }}"
         dockerfile: "{{ django_stack_node_dockerfile }}"
+        buildargs: "{{ django_stack_node_buildargs }}"
         path: "{{ django_stack_node_dockercontext }}"
         tag: "{{ django_stack_node_ver }}"
         force: yes
@@ -33,7 +34,6 @@
       docker_container:
         name: django_stack_node
         image: "{{ node_grsec_image|default('node') }}:{{ django_stack_node_ver }}"
-        buildargs: "{{ django_stack_node_buildargs }}"
         volumes:
           - "{{ tmp_dir_git }}:{{ active_deploy_dir }}"
           - "{{ tmp_dir }}:/status"
