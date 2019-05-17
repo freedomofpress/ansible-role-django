@@ -43,7 +43,7 @@ django_stack_venv_no_log: "{{ django_stack_global_no_log }}"
 django_stack_venv_base_pkgs: []
 django_stack_venv_cmds: []
 django_stack_venv_docker_volumes: []
-django_stack_venv_docker_image: "quay.io/freedomofpress/debian-jessie-venv:20180201"
+django_stack_venv_docker_image: "quay.io/freedomofpress/ubuntu-xenial-venv@sha256:132f5164abac16b04d918547e4d0327bbd98a42ab33ef21d017d962cec2cb5aa"
 django_stack_optional_pip: []
 # - name: django
 #   python: python2
