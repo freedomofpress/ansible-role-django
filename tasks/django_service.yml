@@ -32,6 +32,14 @@
   no_log: true
   notify: Restart Gunicorn
 
+- name: Ensure deploy directory created, writable by gcorn user
+  file:
+    state: directory
+    path: "{{ django_stack_version_file | dirname }}"
+    mode: 0755
+    owner: "{{ django_stack_gcorn_user }}"
+    group: "{{ django_stack_gcorn_group }}"
+
 - block:
     # Designed to only be one once per install
     - name: Django optional pre db commands
@@ -65,6 +73,15 @@
       with_items: ["{{ django_stack_manage_post }}"]
       ignore_errors: "{{ django_stack_manage_post_ignore }}"
       when: "django_first_install"
+
+    - name: Run version script
+      command: "{{ django_stack_version_script }}"
+      args:
+        chdir: "{{ active_deploy_dir }}"
+      environment:
+        DJANGO_VERSION_FILE: "{{ django_stack_version_file }}"
+        PATH: "{{ django_stack_venv_dir }}/bin:{{ ansible_env.PATH }}"
+      when: django_stack_version_script != ""
 
   become_user: "{{ django_stack_gcorn_user }}"
   become: yes
