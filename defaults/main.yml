@@ -151,3 +151,7 @@ django_stack_celery_svc_conf:
   group: "{{ django_stack_celery_group }}"
 django_stack_celery_sysd:
   after: network.target
+# relative path to a version file script which dumps server data to disk
+# this file will be ingested by a django endpoint if coded into the app
+django_stack_version_script: ""
+django_stack_version_file: /deploy/version
