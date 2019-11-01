@@ -53,6 +53,26 @@
         virtualenv_python: "{{ django_stack_venv_python }}"
         virtualenv_site_packages: "{{ django_stack_venv_sitepackage }}"
       no_log: "{{ django_stack_venv_no_log }}"
+      when: django_stack_github_requirements_path is not defined
+
+    - name: Setup virtualenv from requriements file with requisite hashes
+      pip:
+        requirements: "/venv-export/git/{{ django_stack_requirements_path }}"
+        virtualenv: "{{ django_stack_venv_dir }}"
+        virtualenv_python: "{{ django_stack_venv_python }}"
+        virtualenv_site_packages: "{{ django_stack_venv_sitepackage }}"
+        extra_args: --require-hashes
+      no_log: "{{ django_stack_venv_no_log }}"
+      when: django_stack_github_requirements_path is defined
+
+    - name: Setup virtualenv additional github requirements
+      pip:
+        requirements: "/venv-export/git/{{ django_stack_github_requirements_path }}"
+        virtualenv: "{{ django_stack_venv_dir }}"
+        virtualenv_python: "{{ django_stack_venv_python }}"
+        virtualenv_site_packages: "{{ django_stack_venv_sitepackage }}"
+      no_log: "{{ django_stack_venv_no_log }}"
+      when: django_stack_github_requirements_path is defined
 
     - name: Move remote virtualenv into docker exportable filespace
       command: mv {{django_stack_venv_dir}} /venv-export/{{django_stack_app_name}}
