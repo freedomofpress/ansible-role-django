@@ -74,6 +74,12 @@
       no_log: "{{ django_stack_venv_no_log }}"
       when: django_stack_github_requirements_path is defined
 
+    # Hack around a probable bug in pip 20.1b1 that leaves INSTALLER and
+    # RECORD files unreadable by any other user than root, which will prevent
+    # rsyncing them as an unprivileged user from outside the container
+    - name: Ensure contents of virtualenv are world-readable
+      command: find {{ django_stack_venv_dir }} -type f -perm 0600 -exec chmod +r {} \;
+
     - name: Move remote virtualenv into docker exportable filespace
       command: mv {{django_stack_venv_dir}} /venv-export/{{django_stack_app_name}}
 
