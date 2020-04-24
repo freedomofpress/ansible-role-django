@@ -81,7 +81,7 @@
       file:
         path: "{{ django_stack_venv_dir }}"
         recurse: yes
-        mode: o=rX
+        mode: g=rX,o=rX
 
     - name: Move remote virtualenv into docker exportable filespace
       command: mv {{django_stack_venv_dir}} /venv-export/{{django_stack_app_name}}
