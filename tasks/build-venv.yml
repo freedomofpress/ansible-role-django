@@ -40,7 +40,7 @@
         virtualenv_site_packages: "{{ django_stack_venv_sitepackage }}"
         extra_args: "-U"
       no_log: "{{ django_stack_venv_no_log }}"
-      with_items: "{{ ['pip==20.0.2'] + django_stack_venv_base_pkgs }}"
+      with_items: "{{ ['pip'] + django_stack_venv_base_pkgs }}"
 
     - name: Optional commands to run prior to req install
       command: "{{ item }}"
