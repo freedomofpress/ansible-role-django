@@ -135,6 +135,11 @@ django_stack_www_snippets:
     template: nginx-snippet.j2
     notify: reload nginx
 
+# Add something to the command list if you want to run manage.py crons
+django_stack_managepy_cron_job: /usr/local/bin/django-managepy-cron
+django_stack_managepy_cron_log: /var/log/django-managepy-cron.log
+django_stack_managepy_commands: []
+
 # Over-ride this boolean to enable celery worker system service
 django_stack_celery_worker: false
 django_stack_celery_nodes: "w1"

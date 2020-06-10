@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -e
+
+if [[ "$(/usr/bin/whoami)" != '{{ django_stack_gcorn_user }}' ]] ; then
+    echo 'This script must be run as {{ django_stack_gcorn_user }}.'
+    exit 1
+fi
+
+django_bin="$HOME/{{ django_stack_app_name }}-{{ django_stack_active_gcorn_svc }}/bin"
+django_www="/var/www/django-{{ django_stack_active_gcorn_svc }}"
+
+# Source the correct env.
+source "$django_bin/activate"
+
+run_manage_py() {
+    if "$django_www/manage.py" "$@"; then
+        status='successful'
+    else
+        status='failed'
+    fi
+    echo "$(date --iso-8601=seconds) - $status cron: manage.py $*" >> '{{ django_stack_managepy_cron_log }}'
+}
+
+# Run each manage.py command and log results
+{% for managepy_args in django_stack_managepy_commands %}
+run_manage_py {{ managepy_args }}
+{% endfor %}
