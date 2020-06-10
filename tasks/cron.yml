@@ -37,8 +37,11 @@
   cron:
     name: run daily manage.py commands
     user: "{{ django_stack_gcorn_user }}"
-    hour: "9"
-    minute: "0"
+    minute: "{{ django_stack_managepy_minute | default('0') }}"
+    hour: "{{ django_stack_managepy_hour | default('9') }}"
+    day: "{{ django_stack_managepy_day | default(omit) }}"
+    month: "{{ django_stack_managepy_month | default(omit) }}"
+    weekday: "{{ django_stack_managepy_weekday | default(omit) }}"
     job: "{{ django_stack_managepy_cron_job }}"
     state: present
   when: django_stack_managepy_commands != []
