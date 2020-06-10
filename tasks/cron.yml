@@ -1,0 +1,50 @@
+---
+# Updating facts manually to ensure that we have the latest "active"
+# gcorn service, required for the tasks below.
+- setup:
+  tags:
+    - cron
+    - django
+
+- name: Ensure log file in-place, but do not touch if exists
+  copy:
+    content: ""
+    dest: "{{ django_stack_managepy_cron_log }}"
+    mode: 0644
+    owner: "{{ django_stack_gcorn_user }}"
+    group: "{{ django_stack_gcorn_user }}"
+    force: no
+  tags:
+    - cron
+    - django
+
+# Writing a wrapper script to call manage.py due to the (alpha|beta)
+# service management in the django-stack logic. Every time this role
+# is run, the script logic will be updated.
+- name: Configure script to run cron from proper docroot.
+  template:
+    src: "cron-script.j2"
+    dest: "{{ django_stack_managepy_cron_job }}"
+    mode: "0755"
+    owner: root
+    group: "{{ django_stack_gcorn_user }}"
+  when: django_stack_managepy_commands != []
+  tags:
+    - cron
+    - django
+
+- name: Configure cron job for manage.py tasks.
+  cron:
+    name: run daily manage.py commands
+    user: "{{ django_stack_gcorn_user }}"
+    minute: "{{ django_stack_managepy_minute | default('0') }}"
+    hour: "{{ django_stack_managepy_hour | default('9') }}"
+    day: "{{ django_stack_managepy_day | default(omit) }}"
+    month: "{{ django_stack_managepy_month | default(omit) }}"
+    weekday: "{{ django_stack_managepy_weekday | default(omit) }}"
+    job: "{{ django_stack_managepy_cron_job }}"
+    state: present
+  when: django_stack_managepy_commands != []
+  tags:
+    - cron
+    - django

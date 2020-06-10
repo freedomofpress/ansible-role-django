@@ -28,5 +28,8 @@
 - include: gunicorn.yml
   tags: gunicorn
 
+- include: cron.yml
+  tags: cron
+
 - include: cleanup_local_containers.yml
   tags: docker
