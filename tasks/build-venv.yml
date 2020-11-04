@@ -34,13 +34,12 @@
 
     - name: Create virtualenv and ensure base packages installed
       pip:
-        name: "{{ item }}"
+        name: "{{ [django_stack_pip_spec ] + django_stack_venv_base_pkgs }}"
         virtualenv: "{{ django_stack_venv_dir }}"
         virtualenv_python: "{{ django_stack_venv_python }}"
         virtualenv_site_packages: "{{ django_stack_venv_sitepackage }}"
         extra_args: "-U"
       no_log: "{{ django_stack_venv_no_log }}"
-      with_items: "{{ ['pip'] + django_stack_venv_base_pkgs }}"
 
     - name: Optional commands to run prior to req install
       command: "{{ item }}"
