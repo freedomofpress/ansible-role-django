@@ -160,3 +160,6 @@ django_stack_celery_sysd:
 # this file will be ingested by a django endpoint if coded into the app
 django_stack_version_script: ""
 django_stack_version_file: /deploy/version
+
+# Force a specific version of pip inside the virtualenv env
+django_stack_pip_spec: "pip==20.2.4"
