@@ -81,7 +81,7 @@
   set_fact:
     tmp_dir: "{{ tmp_dir_results.path }}"
     tmp_dir_git: "{{ tmp_dir_results.path }}/git"
-    django_first_install: "{{ first_time_remote_fact_results|changed }}"
+    django_first_install: "{{ first_time_remote_fact_results is changed }}"
 
 - name: Check if virtualenv already exists
   stat:
