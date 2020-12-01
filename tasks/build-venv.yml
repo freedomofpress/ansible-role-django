@@ -18,10 +18,9 @@
 - block:
     - name: Install system dependencies
       apt:
-        name: "{{ item }}"
+        name: "{{ django_stack_pkgs }}"
         update_cache: yes
         cache_valid_time: 3600
-      with_items: "{{ django_stack_pkgs }}"
       tags: ['pkgs']
 
     # Necessary because there is no way to pass --relocatable to virtualenv from
