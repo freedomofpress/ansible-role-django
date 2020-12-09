@@ -36,8 +36,8 @@
   service:
     name: "{{ django_stack_celery_svc_name }}"
     state: stopped
-  when: (celery_sysd_unit_result|changed and
+  when: (celery_sysd_unit_result is changed and
          celery_sysd_path_result.stat.exists) or
-        celery_config_file_result|changed
+        celery_config_file_result is changed
   tags:
     - skip_ansible_lint
