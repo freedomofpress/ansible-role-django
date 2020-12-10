@@ -104,7 +104,7 @@ django_stack_deploy_src: ""
 # django post manage.py tasks
 django_stack_db_tasks:
   - migrate
-  - collectstatic
+  - collectstatic --noinput
 django_stack_manage_post: []
 django_stack_manage_post_ignore: yes
 django_stack_manage_pre: []
