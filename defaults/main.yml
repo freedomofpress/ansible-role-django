@@ -38,6 +38,8 @@ django_stack_global_no_log: no
 # virtualenv and pip
 django_stack_venv_env_file: "{{ django_stack_gcorn_home }}/.gunicorn-env"
 django_stack_venv_python: python3
+django_stack_venv_get_pip_url: "https://bootstrap.pypa.io/3.5/get-pip.py"
+django_stack_venv_get_pip_hash: "sha256:8b37d310bfc355841bfff46fa3a0a2afeeaa1d66b75734d266a9da705aa2c2b0"
 django_stack_venv_sitepackage: no
 django_stack_venv_no_log: "{{ django_stack_global_no_log }}"
 django_stack_venv_base_pkgs: []
