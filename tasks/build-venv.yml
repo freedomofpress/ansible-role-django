@@ -31,9 +31,27 @@
         path: "{{ django_stack_gcorn_home }}"
         recurse: yes
 
-    - name: Create virtualenv and ensure base packages installed
+    # Virtualenv will install the latest pip before we get to the point
+    # where we can downgrade it, which breaks on 3.5 since pip 21 is
+    # using new syntax (it may be that OS-packaged virtualenv is too old
+    # to have vendored pip and setuptools). So, run the venv creation
+    # and pip install commands manually. We cannot even use OS-packaged
+    # pip for this, as it's too old; we need to manually download the
+    # last 3.5 get-pip.py.
+    - name: Download old version of get-pip.py
+      get_url:
+        url: "{{ django_stack_venv_get_pip_url }}"
+        dest: "{{ django_stack_gcorn_home }}/get-pip.py"
+        checksum: "{{ django_stack_venv_get_pip_hash }}"
+    - name: Create virtualenv and install pip
+      shell: |
+        virtualenv -p {{ django_stack_venv_python }} --no-pip {{django_stack_venv_dir }}
+        . {{ django_stack_venv_dir }}/bin/activate
+        {{ django_stack_venv_python }} {{ django_stack_gcorn_home }}/get-pip.py {{ django_stack_pip_spec }}
+
+    - name: Ensure base packages are installed in virtualenv
       pip:
-        name: "{{ [django_stack_pip_spec ] + django_stack_venv_base_pkgs }}"
+        name: "{{ django_stack_venv_base_pkgs }}"
         virtualenv: "{{ django_stack_venv_dir }}"
         virtualenv_python: "{{ django_stack_venv_python }}"
         virtualenv_site_packages: "{{ django_stack_venv_sitepackage }}"
